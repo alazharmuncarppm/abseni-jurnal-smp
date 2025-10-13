@@ -1012,6 +1012,12 @@
       to { opacity: 0; transform: translateX(100%); }
     }
 
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
     .fade-in {
       animation: fadeIn 0.5s ease-out;
     }
@@ -1432,15 +1438,14 @@
           <table class="data-table" id="gradesTable">
             <thead>
               <tr>
-                <th>No</th>
-                <th>Nama Siswa</th>
-                <th>L/P</th>
-                <th>Nilai (0-100)</th>
+                <th style="width: 60px; font-size: 13px;">No</th>
+                <th style="font-size: 13px;">Nama Siswa</th>
+                <th style="width: 120px; font-size: 13px;">Nilai (0-100)</th>
               </tr>
             </thead>
             <tbody id="gradesTableBody">
               <tr>
-                <td colspan="4" style="text-align: center; color: #666; padding: 20px;">Pilih kelas untuk menampilkan daftar siswa</td>
+                <td colspan="3" style="text-align: center; color: #666; padding: 20px; font-size: 13px;">Pilih kelas untuk menampilkan daftar siswa</td>
               </tr>
             </tbody>
           </table>
@@ -1694,6 +1699,8 @@
         </div>
       </div>
     </div>
+
+
 
     <!-- Rekap Nilai Page -->
     <div id="rekapNilaiContent" class="page-content">
@@ -2987,7 +2994,14 @@
         console.log('Teacher data:', teacher);
         console.log('Current user name:', currentUserName);
         
-
+        // Set Guru field to logged-in teacher (read-only, default value)
+        if (guruSelect) {
+          guruSelect.innerHTML = `<option value="${currentUserName}" selected>${currentUserName}</option>`;
+          guruSelect.disabled = true;
+          guruSelect.style.backgroundColor = '#f5f5f5';
+          guruSelect.style.cursor = 'not-allowed';
+          console.log('Set guru dropdown to current user (read-only):', currentUserName);
+        }
         
         // Populate classes based on teacher's classes or all classes if no specific data
         if (kelasSelect) {
@@ -3758,6 +3772,8 @@
             <h3>Rekap Nilai</h3>
             <p>Laporan nilai siswa per mata pelajaran</p>
           </div>
+          
+
         `;
         
         // Update bottom navigation for Administrator - Dashboard and all Rekap menus
@@ -3795,6 +3811,8 @@
             <h3>Rekap Nilai</h3>
             <p>Laporan nilai siswa per mata pelajaran</p>
           </div>
+          
+
         `;
         
         // Update bottom navigation for Wali Kelas - only Dashboard, Rekap Absensi, and Rekap Nilai
@@ -3852,6 +3870,8 @@
             <h3>Rekap Nilai</h3>
             <p>Laporan nilai siswa per mata pelajaran</p>
           </div>
+          
+
         `;
         
         // Restore full bottom navigation
@@ -3890,6 +3910,7 @@
               </div>
             </div>
           </div>
+
         `;
         
         console.log('Menu updated for role:', role, '- full menu'); // Debug log
@@ -3957,6 +3978,8 @@
       if (targetContent) {
         targetContent.classList.add('active');
       }
+
+
 
       // Populate forms when showing specific pages
       if (targetPage === 'absensi' || targetPage === 'jurnal' || targetPage === 'nilai') {
@@ -4050,13 +4073,13 @@
       const students = studentsData[kelas] || [];
       
       const studentListHTML = students.map((student, index) => `
-        <div class="student-item">
+        <div class="student-item" style="padding: 10px 15px;">
           <div class="student-info">
-            <div class="student-number">${index + 1}</div>
-            <div class="student-name">${student.nama}</div>
+            <div class="student-number" style="font-size: 12px;">${index + 1}</div>
+            <div class="student-name" style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">${student.nama}</div>
           </div>
           <div class="attendance-options">
-            <select class="attendance-dropdown" data-nis="${student.nis}" onchange="selectAttendanceDropdown(this)">
+            <select class="attendance-dropdown" data-nis="${student.nis}" onchange="selectAttendanceDropdown(this)" style="font-size: 12px; min-width: 90px; max-width: 100px;">
               <option value="Hadir" selected>Hadir</option>
               <option value="Sakit">Sakit</option>
               <option value="Izin">Izin</option>
@@ -4337,6 +4360,58 @@
       return dialog;
     }
 
+    function createJournalLoadingDialog() {
+      const dialog = document.createElement('div');
+      dialog.id = 'journalLoadingDialog';
+      dialog.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      `;
+
+      dialog.innerHTML = `
+        <div style="
+          background: white;
+          padding: 30px;
+          border-radius: 15px;
+          text-align: center;
+          min-width: 300px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        ">
+          <div style="font-size: 48px; margin-bottom: 15px; animation: spin 2s linear infinite;">📖</div>
+          <h3 style="margin: 0 0 15px 0; color: #333;">Menyimpan Jurnal</h3>
+          <div style="
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 15px;
+          ">
+            <div style="
+              width: 100%;
+              height: 100%;
+              background: linear-gradient(90deg, #2196F3, #1976D2);
+              animation: pulse 1.5s ease-in-out infinite;
+            "></div>
+          </div>
+          <p style="margin: 0; color: #666; font-size: 14px;">
+            Mohon tunggu, sedang menyimpan jurnal ke server...
+          </p>
+        </div>
+      `;
+
+      return dialog;
+    }
+
     function updateProgress(current, total) {
       const progressText = document.getElementById('progressText');
       const progressBar = document.getElementById('progressBar');
@@ -4353,7 +4428,7 @@
       const tableBody = document.getElementById('gradesTableBody');
 
       if (!kelas) {
-        tableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666; padding: 20px;">Pilih kelas terlebih dahulu</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #666; padding: 20px; font-size: 13px;">Pilih kelas terlebih dahulu</td></tr>';
         return;
       }
 
@@ -4361,11 +4436,10 @@
       
       const tableHTML = students.map((student, index) => `
         <tr>
-          <td>${index + 1}</td>
-          <td>${student.nama}</td>
-          <td>${student.lp}</td>
-          <td>
-            <input type="number" class="nilai-input" min="0" max="100" placeholder="0-100" data-nis="${student.nis}">
+          <td style="font-size: 13px; padding: 10px 8px;">${index + 1}</td>
+          <td style="font-size: 13px; padding: 10px 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${student.nama}</td>
+          <td style="padding: 10px 8px;">
+            <input type="number" class="nilai-input" min="0" max="100" placeholder="0-100" data-nis="${student.nis}" style="font-size: 13px;">
           </td>
         </tr>
       `).join('');
@@ -4508,11 +4582,9 @@
         return;
       }
 
-      // Show loading state
-      const saveBtn = document.querySelector('.btn-primary');
-      const originalText = saveBtn.innerHTML;
-      saveBtn.innerHTML = '⏳ Menyimpan...';
-      saveBtn.disabled = true;
+      // Show loading notification
+      const loadingDialog = createJournalLoadingDialog();
+      document.body.appendChild(loadingDialog);
 
       try {
         const scriptUrl = 'https://script.google.com/macros/s/AKfycbyXPAe7s8PCqCxOUrpQo0AFeU2Xilr1yhr0y08eVsimupP_c8Fi0d2UEoyLMJieHo5R4Q/exec';
@@ -4534,6 +4606,9 @@
 
         const result = await response.json();
 
+        // Remove loading dialog
+        document.body.removeChild(loadingDialog);
+
         if (result.status === 'sukses') {
           // Show success notification
           showSuccessNotification('Jurnal Berhasil Disimpan', `
@@ -4546,7 +4621,7 @@
             📝 Materi: ${materi.substring(0, 100)}${materi.length > 100 ? '...' : ''}
           `);
           
-          // Clear form after successful save
+          // Clear the journal form after successful save
           document.getElementById('materiJurnal').value = '';
         } else {
           alert(`❌ Gagal menyimpan jurnal!\n\nError: ${result.pesan}`);
@@ -4554,11 +4629,13 @@
 
       } catch (error) {
         console.error('Error saving journal:', error);
+        
+        // Remove loading dialog if still present
+        if (document.body.contains(loadingDialog)) {
+          document.body.removeChild(loadingDialog);
+        }
+        
         alert('❌ Terjadi kesalahan saat menyimpan jurnal. Silakan coba lagi.');
-      } finally {
-        // Restore button state
-        saveBtn.innerHTML = originalText;
-        saveBtn.disabled = false;
       }
     }
 
@@ -5612,6 +5689,8 @@
       }
     }
 
+
+
     // Close dropup when clicking outside
     document.addEventListener('click', function(event) {
       const dropup = document.getElementById('rekapDropup');
@@ -5622,5 +5701,5 @@
       }
     });
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98dd7234303189aa',t:'MTc2MDM0MzkyNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98df9c7445d3a8de',t:'MTc2MDM2NjYyNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
