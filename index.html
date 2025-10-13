@@ -1,4 +1,8 @@
-<!DOCTYPE html>
+   <option value="Hadir">✅ Hadir</option>
+   <option value="Sakit">🤒 Sakit</option>
+   <option value="Izin">📋 Izin</option>
+   <option value="Alpha">❌ Alpha</option>
+   <!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
@@ -4091,7 +4095,29 @@
     function setAllAttendance(status) {
       const allDropdowns = document.querySelectorAll('.attendance-dropdown');
       allDropdowns.forEach(dropdown => {
-        dropdown.value = status;
+        // Set the correct value based on the status parameter
+        let dropdownValue = '';
+        switch(status.toLowerCase()) {
+          case 'hadir':
+            dropdownValue = 'Hadir';
+            break;
+          case 'sakit':
+            dropdownValue = 'Sakit';
+            break;
+          case 'izin':
+            dropdownValue = 'Izin';
+            break;
+          case 'alpha':
+            dropdownValue = 'Alpha';
+            break;
+          default:
+            dropdownValue = 'Hadir';
+        }
+        
+        // Set the dropdown value
+        dropdown.value = dropdownValue;
+        
+        // Update the dropdown styling
         dropdown.className = `attendance-dropdown ${status.toLowerCase()}`;
       });
     }
@@ -5601,5 +5627,5 @@
       }
     });
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98dcd371f0db938e',t:'MTc2MDMzNzQyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98dcdb25f237938e',t:'MTc2MDMzNzczNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
