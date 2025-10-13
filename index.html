@@ -635,25 +635,61 @@
     .attendance-btn.active.alpha { background: #f44336; color: white; }
 
     .attendance-dropdown {
-      padding: 8px 12px;
+      padding: 10px 12px;
       border: 2px solid #e1e5e9;
       border-radius: 8px;
       font-size: 14px;
       font-weight: 600;
       background: white;
       cursor: pointer;
-      transition: border-color 0.3s;
-      min-width: 100px;
+      transition: all 0.3s;
+      min-width: 120px;
+      width: 100%;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 16px;
+      padding-right: 35px;
     }
 
     .attendance-dropdown:focus {
       outline: none;
       border-color: #4CAF50;
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    }
+
+    .attendance-dropdown.hadir {
+      border-color: #4CAF50;
+      background-color: #f8fff8;
+      color: #4CAF50;
+    }
+
+    .attendance-dropdown.sakit {
+      border-color: #FF9800;
+      background-color: #fff8f0;
+      color: #FF9800;
+    }
+
+    .attendance-dropdown.izin {
+      border-color: #2196F3;
+      background-color: #f0f8ff;
+      color: #2196F3;
+    }
+
+    .attendance-dropdown.alpha {
+      border-color: #f44336;
+      background-color: #fff8f8;
+      color: #f44336;
     }
 
     .attendance-dropdown option {
-      padding: 8px;
+      padding: 10px;
       font-weight: 600;
+      background: white;
+      color: #333;
     }
 
     /* Mobile Responsive Design */
@@ -796,18 +832,40 @@
         justify-content: center;
       }
 
-      .student-info {
+      .student-item {
+        display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
+        padding: 12px 15px;
+        gap: 10px;
+      }
+
+      .student-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .student-number {
+        font-weight: 600;
+        color: #666;
+        min-width: 25px;
+      }
+
+      .student-name {
+        font-weight: 600;
+        color: #333;
+        flex: 1;
+        word-wrap: break-word;
+        line-height: 1.3;
       }
 
       .attendance-options {
         margin-left: 0;
-        margin-top: 10px;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 6px;
+        margin-top: 0;
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
       }
       
       .attendance-btn {
@@ -816,9 +874,11 @@
       }
 
       .attendance-dropdown {
-        min-width: 100px;
-        font-size: 12px;
-        padding: 6px 10px;
+        min-width: 130px;
+        max-width: 150px;
+        font-size: 13px;
+        padding: 8px 10px;
+        padding-right: 30px;
       }
       
       .data-table {
@@ -3996,18 +4056,12 @@
             <div class="student-name">${student.nama}</div>
           </div>
           <div class="attendance-options">
-            <button class="attendance-btn hadir active" onclick="selectAttendance(this, 'Hadir')" data-nis="${student.nis}">
-              Hadir
-            </button>
-            <button class="attendance-btn sakit" onclick="selectAttendance(this, 'Sakit')" data-nis="${student.nis}">
-              Sakit
-            </button>
-            <button class="attendance-btn izin" onclick="selectAttendance(this, 'Izin')" data-nis="${student.nis}">
-              Izin
-            </button>
-            <button class="attendance-btn alpha" onclick="selectAttendance(this, 'Alpha')" data-nis="${student.nis}">
-              Alpha
-            </button>
+            <select class="attendance-dropdown" data-nis="${student.nis}" onchange="selectAttendanceDropdown(this)">
+              <option value="Hadir" selected>✅ Hadir</option>
+              <option value="Sakit">🤒 Sakit</option>
+              <option value="Izin">📋 Izin</option>
+              <option value="Alpha">❌ Alpha</option>
+            </select>
           </div>
         </div>
       `).join('');
@@ -4027,13 +4081,17 @@
       button.classList.add('active');
     }
 
+    function selectAttendanceDropdown(dropdown) {
+      // Update dropdown styling based on selection
+      const value = dropdown.value;
+      dropdown.className = `attendance-dropdown ${value.toLowerCase()}`;
+    }
+
     function setAllAttendance(status) {
-      const allButtons = document.querySelectorAll('.attendance-btn');
-      allButtons.forEach(button => {
-        button.classList.remove('active');
-        if (button.textContent.trim().toLowerCase() === status.toLowerCase()) {
-          button.classList.add('active');
-        }
+      const allDropdowns = document.querySelectorAll('.attendance-dropdown');
+      allDropdowns.forEach(dropdown => {
+        dropdown.value = status;
+        dropdown.className = `attendance-dropdown ${status.toLowerCase()}`;
       });
     }
 
@@ -4055,8 +4113,8 @@
       
       studentItems.forEach(item => {
         const studentName = item.querySelector('.student-name').textContent;
-        const activeButton = item.querySelector('.attendance-btn.active');
-        const status = activeButton ? activeButton.textContent.trim() : 'Hadir';
+        const dropdown = item.querySelector('.attendance-dropdown');
+        const status = dropdown ? dropdown.value : 'Hadir';
         
         // Find student data to get NIS and gender
         const students = studentsData[kelas] || [];
@@ -4136,13 +4194,11 @@
       if (successCount === attendanceData.length) {
         showSimpleSuccessNotification(`Absensi berhasil disimpan! (${successCount}/${attendanceData.length} siswa)`);
         
-        // Reset all attendance buttons to "Hadir" (default) but keep the student list
-        const allButtons = document.querySelectorAll('.attendance-btn');
-        allButtons.forEach(button => {
-          button.classList.remove('active');
-          if (button.textContent.trim().toLowerCase() === 'hadir') {
-            button.classList.add('active');
-          }
+        // Reset all attendance dropdowns to "Hadir" (default) but keep the student list
+        const allDropdowns = document.querySelectorAll('.attendance-dropdown');
+        allDropdowns.forEach(dropdown => {
+          dropdown.value = 'Hadir';
+          dropdown.className = 'attendance-dropdown hadir';
         });
       } else {
         alert(`⚠️ Absensi tersimpan sebagian!\n\nBerhasil: ${successCount}\nGagal: ${failCount}\nTotal: ${attendanceData.length}\n\nSilakan coba lagi untuk data yang gagal.`);
@@ -5544,5 +5600,5 @@
       }
     });
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98db9f2b05685fd8',t:'MTc2MDMyNDc5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98dc83d586b1f8e6',t:'MTc2MDMzNDE2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
