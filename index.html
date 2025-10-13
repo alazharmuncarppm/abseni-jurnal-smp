@@ -1,8 +1,4 @@
-   <option value="Hadir">✅ Hadir</option>
-   <option value="Sakit">🤒 Sakit</option>
-   <option value="Izin">📋 Izin</option>
-   <option value="Alpha">❌ Alpha</option>
-   <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
@@ -839,7 +835,7 @@
 
       .student-item {
         display: flex;
-        flex-direction: column;
+        align-items: center;
         padding: 12px 15px;
         gap: 10px;
       }
@@ -848,7 +844,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        width: 100%;
+        flex: 1;
       }
 
       .student-number {
@@ -866,11 +862,10 @@
       }
 
       .attendance-options {
-        margin-left: 0;
-        margin-top: 0;
-        width: 100%;
+        margin-left: 10px;
         display: flex;
         justify-content: flex-end;
+        flex-shrink: 0;
       }
       
       .attendance-btn {
@@ -4062,10 +4057,10 @@
           </div>
           <div class="attendance-options">
             <select class="attendance-dropdown" data-nis="${student.nis}" onchange="selectAttendanceDropdown(this)">
-              <option value="Hadir" selected>✅ Hadir</option>
-              <option value="Sakit">🤒 Sakit</option>
-              <option value="Izin">📋 Izin</option>
-              <option value="Alpha">❌ Alpha</option>
+              <option value="Hadir" selected>Hadir</option>
+              <option value="Sakit">Sakit</option>
+              <option value="Izin">Izin</option>
+              <option value="Alpha">Alpha</option>
             </select>
           </div>
         </div>
@@ -5627,5 +5622,5 @@
       }
     });
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98dcdb25f237938e',t:'MTc2MDMzNzczNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98dd7234303189aa',t:'MTc2MDM0MzkyNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
