@@ -4239,12 +4239,14 @@
       if (successCount === attendanceData.length) {
         showSimpleSuccessNotification(`Absensi berhasil disimpan! (${successCount}/${attendanceData.length} siswa)`);
         
-        // Reset all attendance dropdowns to "Hadir" (default) but keep the student list
-        const allDropdowns = document.querySelectorAll('.attendance-dropdown');
-        allDropdowns.forEach(dropdown => {
-          dropdown.value = 'Hadir';
-          dropdown.className = 'attendance-dropdown hadir';
-        });
+        // Reset form completely
+        document.getElementById('kelasAbsensi').value = '';
+        document.getElementById('jamAbsensi').value = 'Jam 1-2';
+        document.getElementById('tanggalAbsensi').value = new Date().toISOString().split('T')[0];
+        
+        // Clear student list
+        const studentListContainer = document.getElementById('studentList');
+        studentListContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Pilih kelas untuk menampilkan daftar siswa</p>';
       } else {
         alert(`⚠️ Absensi tersimpan sebagian!\n\nBerhasil: ${successCount}\nGagal: ${failCount}\nTotal: ${attendanceData.length}\n\nSilakan coba lagi untuk data yang gagal.`);
       }
@@ -4560,10 +4562,14 @@
       if (successCount === gradesData.length) {
         showSimpleSuccessNotification('Nilai berhasil disimpan');
         
-        // Clear all input values after successful save
-        nilaiInputs.forEach(input => {
-          input.value = '';
-        });
+        // Reset form completely
+        document.getElementById('kelasNilai').value = '';
+        document.getElementById('jenisNilai').value = 'Tugas';
+        document.getElementById('topikNilai').value = '';
+        
+        // Clear grades table
+        const tableBody = document.getElementById('gradesTableBody');
+        tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #666; padding: 20px; font-size: 13px;">Pilih kelas untuk menampilkan daftar siswa</td></tr>';
       } else {
         alert(`⚠️ Nilai tersimpan sebagian!\n\nBerhasil: ${successCount}\nGagal: ${failCount}\nTotal: ${gradesData.length}\n\nSilakan coba lagi untuk data yang gagal.`);
       }
@@ -4621,7 +4627,10 @@
             📝 Materi: ${materi.substring(0, 100)}${materi.length > 100 ? '...' : ''}
           `);
           
-          // Clear the journal form after successful save
+          // Reset form completely
+          document.getElementById('tanggalJurnal').value = new Date().toISOString().split('T')[0];
+          document.getElementById('kelasJurnal').value = '';
+          document.getElementById('jamJurnal').value = 'Jam 1-2';
           document.getElementById('materiJurnal').value = '';
         } else {
           alert(`❌ Gagal menyimpan jurnal!\n\nError: ${result.pesan}`);
@@ -5701,5 +5710,5 @@
       }
     });
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98df9c7445d3a8de',t:'MTc2MDM2NjYyNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98dfbb43f0584028',t:'MTc2MDM2Nzg4OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
