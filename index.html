@@ -847,14 +847,20 @@
       }
 
       .action-buttons {
-        flex-direction: column;
-        gap: 8px;
+        flex-direction: row;
+        gap: 6px;
+        flex-wrap: wrap;
       }
       
       .btn {
-        padding: 12px 16px;
-        font-size: 14px;
+        padding: 10px 8px;
+        font-size: 12px;
         justify-content: center;
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
 
       .student-item {
@@ -1281,7 +1287,7 @@
           
           <div class="form-group-inline">
             <label>Jam Ke</label>
-            <select id="jamAbsensi" class="form-select">
+            <select id="jamAbsensi" class="form-select" onchange="loadStudents()">
               <option value="Jam 1-2">Jam 1-2</option>
               <option value="Jam 3-4">Jam 3-4</option>
               <option value="Jam 5-6">Jam 5-6</option>
@@ -1292,7 +1298,7 @@
           
           <div class="form-group-inline">
             <label>Tanggal</label>
-            <input type="date" id="tanggalAbsensi" class="form-input-inline">
+            <input type="date" id="tanggalAbsensi" class="form-input-inline" onchange="loadStudents()">
           </div>
         </div>
         
@@ -1319,7 +1325,7 @@
         </div>
         
         <div style="text-align: center; margin-top: 20px;">
-          <button class="btn btn-primary" onclick="saveAttendance()" style="padding: 12px 30px; font-size: 16px;">
+          <button class="btn btn-primary" onclick="saveAttendance()" id="saveAttendanceBtn" style="padding: 12px 30px; font-size: 16px;">
             💾 Simpan Absensi
           </button>
         </div>
@@ -1337,7 +1343,7 @@
         <div class="filter-section">
           <div class="form-group-inline">
             <label>Tanggal</label>
-            <input type="date" id="tanggalJurnal" class="form-input-inline">
+            <input type="date" id="tanggalJurnal" class="form-input-inline" onchange="checkJournalDuplicate()">
           </div>
           
           <div class="form-group-inline">
@@ -1351,7 +1357,7 @@
           
           <div class="form-group-inline">
             <label>Kelas</label>
-            <select id="kelasJurnal" class="form-select">
+            <select id="kelasJurnal" class="form-select" onchange="checkJournalDuplicate()">
               <option value="VII A">VII A</option>
               <option value="VII B">VII B</option>
               <option value="VIII A">VIII A</option>
@@ -1363,7 +1369,7 @@
           
           <div class="form-group-inline">
             <label>Jam Ke</label>
-            <select id="jamJurnal" class="form-select">
+            <select id="jamJurnal" class="form-select" onchange="checkJournalDuplicate()">
               <option value="Jam 1-2">Jam 1-2</option>
               <option value="Jam 3-4">Jam 3-4</option>
               <option value="Jam 5-6">Jam 5-6</option>
@@ -3664,6 +3670,15 @@
         }
       });
 
+      // Set today's date specifically for form inputs when pages are shown
+      const formDateInputs = ['tanggalAbsensi', 'tanggalJurnal'];
+      formDateInputs.forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+          input.value = today;
+        }
+      });
+
       // Set default date ranges for reports
       setDefaultDateRange();
 
@@ -4011,6 +4026,17 @@
           console.log('Populating forms for page:', targetPage);
           populateTeacherForms();
           
+          // Set today's date for form inputs
+          const today = new Date().toISOString().split('T')[0];
+          if (targetPage === 'absensi') {
+            const tanggalAbsensi = document.getElementById('tanggalAbsensi');
+            if (tanggalAbsensi) tanggalAbsensi.value = today;
+          }
+          if (targetPage === 'jurnal') {
+            const tanggalJurnal = document.getElementById('tanggalJurnal');
+            if (tanggalJurnal) tanggalJurnal.value = today;
+          }
+          
           // Force re-populate absensi form if on absensi page
           if (targetPage === 'absensi') {
             setTimeout(() => {
@@ -4087,10 +4113,41 @@
 
     function loadStudents() {
       const kelas = document.getElementById('kelasAbsensi').value;
+      const tanggal = document.getElementById('tanggalAbsensi').value;
+      const jam = document.getElementById('jamAbsensi').value;
       const studentListContainer = document.getElementById('studentList');
 
       if (!kelas) {
         studentListContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Pilih kelas terlebih dahulu</p>';
+        return;
+      }
+
+      if (!tanggal || !jam) {
+        studentListContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Pilih tanggal dan jam terlebih dahulu</p>';
+        return;
+      }
+
+      // Check for duplicate attendance entry
+      const isDuplicate = attendanceReportData.some(record => {
+        return record.kelas === kelas && 
+               record.tanggal === tanggal && 
+               record.jam === jam;
+      });
+
+      if (isDuplicate) {
+        studentListContainer.innerHTML = `
+          <div style="text-align: center; padding: 30px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; margin: 10px 0;">
+            <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
+            <h3 style="color: #856404; margin: 0 0 10px 0;">Absensi Sudah Diisi!</h3>
+            <p style="color: #856404; margin: 0; font-size: 14px; line-height: 1.5;">
+              Absensi untuk <strong>Kelas ${kelas}</strong> pada tanggal <strong>${formatDate(tanggal)}</strong> 
+              dan <strong>${jam}</strong> sudah pernah diinput sebelumnya.
+            </p>
+            <p style="color: #856404; margin: 10px 0 0 0; font-size: 13px; font-style: italic;">
+              Silakan pilih kelas, tanggal, atau jam yang berbeda.
+            </p>
+          </div>
+        `;
         return;
       }
 
@@ -4102,7 +4159,7 @@
             <div class="student-number" style="font-size: 12px;">${index + 1}</div>
             <div class="student-name" style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">${student.nama}</div>
           </div>
-          <div class="attendance-options">
+          <div class="attendance-options" style="display: flex; align-items: center; gap: 8px;">
             <select class="attendance-dropdown" data-nis="${student.nis}" onchange="selectAttendanceDropdown(this)" style="font-size: 12px; min-width: 90px; max-width: 100px;">
               <option value="Hadir" selected>Hadir</option>
               <option value="Sakit">Sakit</option>
@@ -4164,6 +4221,8 @@
       });
     }
 
+
+
     async function saveAttendance() {
       const kelas = document.getElementById('kelasAbsensi').value;
       const guru = document.getElementById('guruAbsensi').value;
@@ -4173,6 +4232,18 @@
 
       if (!kelas || !guru || !mapel || !jam || !tanggal) {
         alert('Harap lengkapi semua field!');
+        return;
+      }
+
+      // Check for duplicate attendance entry
+      const isDuplicate = attendanceReportData.some(record => {
+        return record.kelas === kelas && 
+               record.tanggal === tanggal && 
+               record.jam === jam;
+      });
+
+      if (isDuplicate) {
+        alert(`❌ Absensi di kelas ${kelas} pada tanggal ${formatDate(tanggal)} dan ${jam} sudah di input!\n\nSilakan pilih kelas, tanggal, atau jam yang berbeda.`);
         return;
       }
 
@@ -4206,7 +4277,7 @@
       const progressDialog = createProgressDialog(attendanceData.length);
       document.body.appendChild(progressDialog);
 
-      const scriptUrl = 'https://script.google.com/macros/s/AKfycbx6qUz_j_hp9mZCTApIF1lFXuxQxTYyjPjY6yYM_Wl5a_Lu3jRY9wI17SrSKl8LrSQl/exec';
+      const scriptUrl = 'https://script.google.com/macros/s/AKfycbzILDROC_P1dwSFNbrZwCDgfm8mms-l9qEjFYS5wUH4SP2TrE9uJMq6s3viCbJV57_v/exec';
       const currentTime = new Date().toLocaleTimeString('id-ID');
       
       let successCount = 0;
@@ -4221,6 +4292,7 @@
         
         try {
           const formData = new FormData();
+          
           formData.append('mode', 'insert');
           formData.append('tanggalAbsen', tanggal);
           formData.append('Waktu', currentTime);
@@ -4234,12 +4306,19 @@
           formData.append('keterangan', '');
           formData.append('guru', guru);
 
+          console.log('Sending attendance data for:', student.nama, 'Status:', student.status);
+
           const response = await fetch(scriptUrl, {
             method: 'POST',
             body: formData
           });
 
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
           const result = await response.json();
+          console.log('Response for student', student.nama, ':', result);
           
           if (result.status === 'sukses') {
             successCount++;
@@ -4253,7 +4332,7 @@
         }
 
         // Small delay to show progress
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 300));
       }
 
       // Remove progress dialog
@@ -4261,7 +4340,7 @@
 
       // Show result
       if (successCount === attendanceData.length) {
-        showSimpleSuccessNotification(`Absensi berhasil disimpan! (${successCount}/${attendanceData.length} siswa)`);
+        showSimpleSuccessNotification(`✅ Absensi berhasil disimpan untuk ${successCount} siswa!`);
         
         // Reset form completely
         document.getElementById('kelasAbsensi').value = '';
@@ -4271,6 +4350,11 @@
         // Clear student list
         const studentListContainer = document.getElementById('studentList');
         studentListContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Pilih kelas untuk menampilkan daftar siswa</p>';
+        
+        // Reload attendance report data to reflect changes
+        setTimeout(() => {
+          loadAttendanceReportData();
+        }, 1000);
       } else {
         alert(`⚠️ Absensi tersimpan sebagian!\n\nBerhasil: ${successCount}\nGagal: ${failCount}\nTotal: ${attendanceData.length}\n\nSilakan coba lagi untuk data yang gagal.`);
       }
@@ -4584,7 +4668,7 @@
 
       // Show result notification
       if (successCount === gradesData.length) {
-        showSimpleSuccessNotification('Nilai berhasil disimpan');
+        showSimpleSuccessNotification(`✅ Nilai berhasil disimpan untuk ${successCount} siswa!`);
         
         // Reset form completely
         document.getElementById('kelasNilai').value = '';
@@ -4599,6 +4683,87 @@
       }
     }
 
+    // Function to check for duplicate journal entry
+    function checkJournalDuplicate() {
+      const kelas = document.getElementById('kelasJurnal').value;
+      const tanggal = document.getElementById('tanggalJurnal').value;
+      const jam = document.getElementById('jamJurnal').value;
+      const materiContainer = document.querySelector('.form-group:has(#materiJurnal)');
+      const actionButtons = document.querySelector('#jurnalContent .action-buttons');
+
+      if (!kelas || !tanggal || !jam) {
+        // Show form if any field is empty
+        if (materiContainer) {
+          materiContainer.style.display = 'block';
+        }
+        if (actionButtons) {
+          actionButtons.style.display = 'flex';
+        }
+        
+        // Remove warning if exists
+        const warningDiv = document.getElementById('journalDuplicateWarning');
+        if (warningDiv) {
+          warningDiv.remove();
+        }
+        return;
+      }
+
+      // Check for duplicate journal entry
+      const isDuplicate = journalReportData.some(record => {
+        return record.kelas === kelas && 
+               record.tanggal === tanggal && 
+               record.jam === jam;
+      });
+
+      if (isDuplicate) {
+        // Hide materi form and action buttons
+        if (materiContainer) {
+          materiContainer.style.display = 'none';
+        }
+        if (actionButtons) {
+          actionButtons.style.display = 'none';
+        }
+
+        // Show duplicate warning after filter section
+        const filterSection = document.querySelector('#jurnalContent .filter-section').parentElement;
+        let warningDiv = document.getElementById('journalDuplicateWarning');
+        
+        if (!warningDiv) {
+          warningDiv = document.createElement('div');
+          warningDiv.id = 'journalDuplicateWarning';
+          filterSection.insertAdjacentElement('afterend', warningDiv);
+        }
+
+        warningDiv.innerHTML = `
+          <div style="text-align: center; padding: 30px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; margin: 20px 0;">
+            <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
+            <h3 style="color: #856404; margin: 0 0 10px 0;">Jurnal Sudah Diisi!</h3>
+            <p style="color: #856404; margin: 0; font-size: 14px; line-height: 1.5;">
+              Jurnal untuk <strong>Kelas ${kelas}</strong> pada tanggal <strong>${formatDate(tanggal)}</strong> 
+              dan <strong>${jam}</strong> sudah pernah diinput sebelumnya.
+            </p>
+            <p style="color: #856404; margin: 10px 0 0 0; font-size: 13px; font-style: italic;">
+              Silakan pilih kelas, tanggal, atau jam yang berbeda.
+            </p>
+          </div>
+        `;
+      } else {
+        // Show form if no duplicate
+        if (materiContainer) {
+          materiContainer.style.display = 'block';
+        }
+        if (actionButtons) {
+          actionButtons.style.display = 'flex';
+        }
+
+        // Remove warning if exists
+        const warningDiv = document.getElementById('journalDuplicateWarning');
+        if (warningDiv) {
+          warningDiv.remove();
+        }
+      }
+    }
+
     async function saveJournal() {
       const tanggal = document.getElementById('tanggalJurnal').value;
       const guru = document.getElementById('guruJurnal').value;
@@ -4609,6 +4774,18 @@
 
       if (!tanggal || !guru || !kelas || !jam || !mapel || !materi) {
         alert('Harap lengkapi semua field!');
+        return;
+      }
+
+      // Check for duplicate journal entry
+      const isDuplicate = journalReportData.some(record => {
+        return record.kelas === kelas && 
+               record.tanggal === tanggal && 
+               record.jam === jam;
+      });
+
+      if (isDuplicate) {
+        alert(`❌ Jurnal di kelas ${kelas} pada tanggal ${formatDate(tanggal)} dan ${jam} sudah di input!\n\nSilakan pilih kelas, tanggal, atau jam yang berbeda.`);
         return;
       }
 
@@ -4640,16 +4817,8 @@
         document.body.removeChild(loadingDialog);
 
         if (result.status === 'sukses') {
-          // Show success notification
-          showSuccessNotification('Jurnal Berhasil Disimpan', `
-            <strong>Detail Jurnal:</strong><br>
-            📅 Tanggal: ${tanggal}<br>
-            🏫 Kelas: ${kelas}<br>
-            📚 Mapel: ${mapel}<br>
-            ⏰ Jam: ${jam}<br>
-            👨‍🏫 Guru: ${guru}<br><br>
-            📝 Materi: ${materi.substring(0, 100)}${materi.length > 100 ? '...' : ''}
-          `);
+          // Show simple success notification
+          showSimpleSuccessNotification('✅ Jurnal berhasil disimpan!');
           
           // Reset form completely
           document.getElementById('tanggalJurnal').value = new Date().toISOString().split('T')[0];
@@ -5773,5 +5942,5 @@
       }
     });
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98e3db9db038fd7f',t:'MTc2MDQxMTE1Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f4785e23455fea',t:'MTc2MDU4NTM0OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
