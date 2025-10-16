@@ -936,11 +936,11 @@
       }
       
       .stat-number {
-        font-size: 24px;
+        font-size: 14px;
       }
       
       .stat-label {
-        font-size: 12px;
+        font-size: 10px;
       }
       
       .dropup-menu {
@@ -1113,14 +1113,14 @@
     }
 
     .stat-number {
-      font-size: 32px;
-      font-weight: 700;
+      font-size: 16px;
+      font-weight: 600;
       margin-bottom: 5px;
     }
 
     .stat-label {
       color: #666;
-      font-size: 14px;
+      font-size: 11px;
     }
 
     /* Loading indicator */
@@ -1547,16 +1547,16 @@
         
         <div class="action-buttons">
           <button class="btn btn-primary" onclick="filterAttendanceReport()">
-            🔍 Filter Data
+            Filter Data
           </button>
           <button class="btn btn-info" onclick="showAttendanceStats()">
-            📈 Statistik
+            Statistik
           </button>
           <button class="btn btn-warning" onclick="toggleReportView()" id="toggleViewBtn">
-            📋 Tampilan Ringkas
+            Tampilan Ringkas
           </button>
           <button class="btn btn-danger" onclick="downloadPDF('absensi')">
-            📄 Download PDF
+            Download PDF
           </button>
         </div>
       </div>
@@ -1696,10 +1696,10 @@
         
         <div class="action-buttons">
           <button class="btn btn-primary" onclick="filterJournalReport()">
-            🔍 Filter Data
+            Filter Data
           </button>
           <button class="btn btn-danger" onclick="downloadPDF('jurnal')">
-            📄 Download PDF
+            Download PDF
           </button>
         </div>
       </div>
@@ -1783,13 +1783,13 @@
         
         <div class="action-buttons">
           <button class="btn btn-primary" onclick="filterGradesReport()">
-            🔍 Filter Data
+            Filter Data
           </button>
           <button class="btn btn-info" onclick="showGradesStats()">
-            📈 Statistik
+            Statistik
           </button>
           <button class="btn btn-danger" onclick="downloadPDF('nilai')">
-            📄 Download PDF
+            Download PDF
           </button>
         </div>
       </div>
@@ -5057,12 +5057,12 @@
         // Switch to detailed view
         detailedView.classList.remove('hidden');
         summaryView.classList.add('hidden');
-        toggleBtn.innerHTML = '📋 Tampilan Ringkas';
+        toggleBtn.innerHTML = 'Tampilan Ringkas';
       } else {
         // Switch to summary view
         detailedView.classList.add('hidden');
         summaryView.classList.remove('hidden');
-        toggleBtn.innerHTML = '📄 Tampilan Rinci';
+        toggleBtn.innerHTML = 'Tampilan Rinci';
         
         // Update summary view with current filtered data
         const kelas = document.getElementById('kelasRekapAbsensi').value;
@@ -5942,5 +5942,5 @@
       }
     });
   </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f47ffd03065fea',t:'MTc2MDU4NTY2MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98f4cb83256b5fea',t:'MTc2MDU4ODc1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
