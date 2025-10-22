@@ -738,6 +738,13 @@
       gap: 12px;
     }
 
+    /* Form Layout Styles for Nilai */
+    .nilai-form-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
     .form-row {
       display: flex;
       gap: 10px;
@@ -911,9 +918,10 @@
         gap: 10px;
       }
 
-      /* Override for absensi and jurnal form layout on mobile */
+      /* Override for absensi, jurnal, and nilai form layout on mobile */
       .absensi-form-layout,
-      .jurnal-form-layout {
+      .jurnal-form-layout,
+      .nilai-form-layout {
         gap: 10px;
       }
 
@@ -1407,16 +1415,20 @@
      <p class="page-subtitle">Input nilai siswa berdasarkan jenis penilaian</p>
     </div>
     <div class="content-card">
-     <div class="filter-section">
-      <div class="form-group-inline"><label>Kelas</label> <select id="kelasNilai" class="form-select" onchange="loadStudentsForGrades()"> <option value="">Pilih Kelas</option> </select>
-      </div>
-      <div class="form-group-inline"><label>Mata Pelajaran</label> <select id="mapelNilai" class="form-select"> <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option> <option value="Matematika">Matematika</option> <option value="Bahasa Indonesia">Bahasa Indonesia</option> <option value="Bahasa Inggris">Bahasa Inggris</option> <option value="IPA">IPA</option> <option value="IPS">IPS</option> </select>
-      </div>
-      <div class="form-group-inline"><label>Jenis Penilaian</label> <select id="jenisNilai" class="form-select"> <option value="Tugas">Tugas</option> <option value="Ulangan">Ulangan</option> <option value="UTS">UTS</option> <option value="UAS">UAS</option> </select>
-      </div>
-      <div class="form-group-inline"><label>Topik Penilaian</label> <input type="text" id="topikNilai" class="form-input-inline" placeholder="Contoh: Sistem Persamaan Linear">
-      </div>
-      <div class="form-group-inline"><label>Guru</label> <select id="guruNilai" class="form-select"> <option value="Ahmad Fauzi, S.Pd">Ahmad Fauzi, S.Pd</option> <option value="Siti Nurhaliza, S.Pd">Siti Nurhaliza, S.Pd</option> <option value="Budi Setiawan, S.Pd">Budi Setiawan, S.Pd</option> </select>
+     <div class="nilai-form-layout"><!-- Row 1: Kelas dan Mata Pelajaran -->
+      <div class="form-row">
+       <div class="form-group-inline form-half"><label>Kelas</label> <select id="kelasNilai" class="form-select form-compact" onchange="loadStudentsForGrades()"> <option value="">Pilih Kelas</option> </select>
+       </div>
+       <div class="form-group-inline form-half"><label>Mata Pelajaran</label> <select id="mapelNilai" class="form-select form-compact"> <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option> <option value="Matematika">Matematika</option> <option value="Bahasa Indonesia">Bahasa Indonesia</option> <option value="Bahasa Inggris">Bahasa Inggris</option> <option value="IPA">IPA</option> <option value="IPS">IPS</option> </select>
+       </div>
+      </div><!-- Row 2: Jenis Penilaian dan Guru -->
+      <div class="form-row">
+       <div class="form-group-inline form-half"><label>Jenis Penilaian</label> <select id="jenisNilai" class="form-select form-compact"> <option value="Tugas">Tugas</option> <option value="Ulangan">Ulangan</option> <option value="UTS">UTS</option> <option value="UAS">UAS</option> </select>
+       </div>
+       <div class="form-group-inline form-half"><label>Guru</label> <select id="guruNilai" class="form-select form-compact"> <option value="Ahmad Fauzi, S.Pd">Ahmad Fauzi, S.Pd</option> <option value="Siti Nurhaliza, S.Pd">Siti Nurhaliza, S.Pd</option> <option value="Budi Setiawan, S.Pd">Budi Setiawan, S.Pd</option> </select>
+       </div>
+      </div><!-- Row 3: Topik Penilaian (full width, no dropdown arrow) -->
+      <div class="form-group-inline"><label>Topik Penilaian</label> <input type="text" id="topikNilai" class="form-input-inline form-compact" placeholder="Contoh: Sistem Persamaan Linear">
       </div>
      </div>
     </div>
@@ -5813,5 +5825,5 @@
       }
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'992cb7ec62af5ff0',t:'MTc2MTE3NTE1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'992cc06a15b85ff0',t:'MTc2MTE3NTUwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
