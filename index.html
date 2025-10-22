@@ -556,6 +556,11 @@
       padding-right: 35px;
     }
 
+    .form-select.no-dropdown {
+      background-image: none;
+      padding-right: 10px;
+    }
+
     .form-select:focus, .form-input-inline:focus {
       outline: none;
       border-color: #4CAF50;
@@ -726,6 +731,13 @@
       gap: 12px;
     }
 
+    /* Form Layout Styles for Jurnal */
+    .jurnal-form-layout {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
     .form-row {
       display: flex;
       gap: 10px;
@@ -742,6 +754,11 @@
       font-size: 13px;
       border: 1px solid #e1e5e9;
       border-radius: 6px;
+    }
+
+    .form-compact.no-dropdown {
+      background-image: none;
+      padding-right: 10px;
     }
 
     .form-compact:focus {
@@ -894,8 +911,9 @@
         gap: 10px;
       }
 
-      /* Override for absensi form layout on mobile */
-      .absensi-form-layout {
+      /* Override for absensi and jurnal form layout on mobile */
+      .absensi-form-layout,
+      .jurnal-form-layout {
         gap: 10px;
       }
 
@@ -1361,16 +1379,20 @@
      <p class="page-subtitle">Catat kegiatan pembelajaran yang dilakukan</p>
     </div>
     <div class="content-card">
-     <div class="filter-section">
-      <div class="form-group-inline"><label>Tanggal</label> <input type="date" id="tanggalJurnal" class="form-input-inline" onchange="checkJournalDuplicate()">
-      </div>
-      <div class="form-group-inline"><label>Guru</label> <select id="guruJurnal" class="form-select"> <option value="Ahmad Fauzi, S.Pd">Ahmad Fauzi, S.Pd</option> <option value="Siti Nurhaliza, S.Pd">Siti Nurhaliza, S.Pd</option> <option value="Budi Setiawan, S.Pd">Budi Setiawan, S.Pd</option> </select>
-      </div>
-      <div class="form-group-inline"><label>Kelas</label> <select id="kelasJurnal" class="form-select" onchange="checkJournalDuplicate()"> <option value="VII A">VII A</option> <option value="VII B">VII B</option> <option value="VIII A">VIII A</option> <option value="VIII B">VIII B</option> <option value="IX A">IX A</option> <option value="IX B">IX B</option> </select>
-      </div>
-      <div class="form-group-inline"><label>Jam Ke</label> <select id="jamJurnal" class="form-select" onchange="checkJournalDuplicate()"> <option value="Jam 1-2">Jam 1-2</option> <option value="Jam 3-4">Jam 3-4</option> <option value="Jam 5-6">Jam 5-6</option> <option value="Jam 7-8">Jam 7-8</option> <option value="Jam 9-10">Jam 9-10</option> </select>
-      </div>
-      <div class="form-group-inline"><label>Mata Pelajaran</label> <select id="mapelJurnal" class="form-select"> <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option> <option value="Matematika">Matematika</option> <option value="Bahasa Indonesia">Bahasa Indonesia</option> <option value="Bahasa Inggris">Bahasa Inggris</option> <option value="IPA">IPA</option> <option value="IPS">IPS</option> </select>
+     <div class="filter-section jurnal-form-layout"><!-- Row 1: Kelas dan Mata Pelajaran -->
+      <div class="form-row">
+       <div class="form-group-inline form-half"><label>Kelas</label> <select id="kelasJurnal" class="form-select form-compact" onchange="checkJournalDuplicate()"> <option value="VII A">VII A</option> <option value="VII B">VII B</option> <option value="VIII A">VIII A</option> <option value="VIII B">VIII B</option> <option value="IX A">IX A</option> <option value="IX B">IX B</option> </select>
+       </div>
+       <div class="form-group-inline form-half"><label>Mata Pelajaran</label> <select id="mapelJurnal" class="form-select form-compact"> <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option> <option value="Matematika">Matematika</option> <option value="Bahasa Indonesia">Bahasa Indonesia</option> <option value="Bahasa Inggris">Bahasa Inggris</option> <option value="IPA">IPA</option> <option value="IPS">IPS</option> </select>
+       </div>
+      </div><!-- Row 2: Jam Ke dan Tanggal -->
+      <div class="form-row">
+       <div class="form-group-inline form-half"><label>Jam Ke</label> <select id="jamJurnal" class="form-select form-compact" onchange="checkJournalDuplicate()"> <option value="Jam 1-2">Jam 1-2</option> <option value="Jam 3-4">Jam 3-4</option> <option value="Jam 5-6">Jam 5-6</option> <option value="Jam 7-8">Jam 7-8</option> <option value="Jam 9-10">Jam 9-10</option> </select>
+       </div>
+       <div class="form-group-inline form-half"><label>Tanggal</label> <input type="date" id="tanggalJurnal" class="form-input-inline form-compact" onchange="checkJournalDuplicate()">
+       </div>
+      </div><!-- Row 3: Guru (full width) -->
+      <div class="form-group-inline"><label>Guru</label> <select id="guruJurnal" class="form-select form-compact"> <option value="Ahmad Fauzi, S.Pd">Ahmad Fauzi, S.Pd</option> <option value="Siti Nurhaliza, S.Pd">Siti Nurhaliza, S.Pd</option> <option value="Budi Setiawan, S.Pd">Budi Setiawan, S.Pd</option> </select>
       </div>
      </div>
      <div class="form-group"><label>Materi Pembelajaran</label> <textarea id="materiJurnal" class="form-input" rows="4" placeholder="Tuliskan materi yang diajarkan hari ini..."></textarea>
@@ -2442,6 +2464,7 @@
         guruAbsensi.disabled = true;
         guruAbsensi.style.backgroundColor = '#f5f5f5';
         guruAbsensi.style.cursor = 'not-allowed';
+        guruAbsensi.classList.add('no-dropdown');
       }
 
       // Populate Kelas dropdown with teacher's classes only
@@ -2505,6 +2528,7 @@
         guruJurnal.disabled = true;
         guruJurnal.style.backgroundColor = '#f5f5f5';
         guruJurnal.style.cursor = 'not-allowed';
+        guruJurnal.classList.add('no-dropdown');
       }
 
       const kelasJurnal = document.getElementById('kelasJurnal');
@@ -2550,6 +2574,7 @@
         guruNilai.disabled = true;
         guruNilai.style.backgroundColor = '#f5f5f5';
         guruNilai.style.cursor = 'not-allowed';
+        guruNilai.classList.add('no-dropdown');
       }
 
       const kelasNilai = document.getElementById('kelasNilai');
@@ -2638,6 +2663,7 @@
             guruSelect.disabled = true;
             guruSelect.style.backgroundColor = '#f5f5f5';
             guruSelect.style.cursor = 'not-allowed';
+            guruSelect.classList.add('no-dropdown');
           }
           
           // Populate Mata Pelajaran dropdown with teacher's subjects + "Semua Mapel" option
@@ -2662,6 +2688,7 @@
             guruSelect.disabled = true;
             guruSelect.style.backgroundColor = '#f5f5f5';
             guruSelect.style.cursor = 'not-allowed';
+            guruSelect.classList.add('no-dropdown');
           }
           if (mapelSelect) {
             mapelSelect.innerHTML = '<option value="">Semua Mapel</option>';
@@ -2873,6 +2900,7 @@
           guruSelect.disabled = true;
           guruSelect.style.backgroundColor = '#f5f5f5';
           guruSelect.style.cursor = 'not-allowed';
+          guruSelect.classList.add('no-dropdown');
           console.log('Set guru dropdown to current user (read-only):', currentUserName);
         }
         
@@ -5785,5 +5813,5 @@
       }
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'992cae78e1085ff0',t:'MTc2MTE3NDc2OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'992cb7ec62af5ff0',t:'MTc2MTE3NTE1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
