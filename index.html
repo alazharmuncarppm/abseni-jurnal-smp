@@ -1255,29 +1255,8 @@
      </div>
      <div class="form-group"><label>Login Sebagai</label>
       <div class="role-cards" id="roleCards">
-       <div class="role-card" onclick="selectRole('Administrator')">
-        <div class="role-icon">
-         👨‍💼
-        </div>
-        <div class="role-label">
-         Administrator
-        </div><input type="radio" name="role" value="Administrator" style="display: none;">
-       </div>
-       <div class="role-card active" onclick="selectRole('Guru')">
-        <div class="role-icon">
-         👨‍🏫
-        </div>
-        <div class="role-label">
-         Guru
-        </div><input type="radio" name="role" value="Guru" checked style="display: none;">
-       </div>
-       <div class="role-card" onclick="selectRole('Wali Kelas')">
-        <div class="role-icon">
-         👨‍🏫
-        </div>
-        <div class="role-label">
-         Wali Kelas
-        </div><input type="radio" name="role" value="Wali Kelas" style="display: none;">
+       <div style="text-align: center; color: #666; padding: 20px; font-style: italic;">
+        Masukkan username terlebih dahulu
        </div>
       </div>
      </div><button type="submit" class="login-btn"> Masuk </button>
@@ -2366,26 +2345,36 @@
 
     // Update role cards based on username input
     function updateRoleCards() {
-      const username = document.getElementById('username').value;
+      const username = document.getElementById('username').value.trim();
       const roleCardsContainer = document.getElementById('roleCards');
       
-      if (!username || !usersData[username]) {
-        // Show default roles
+      // Jika username kosong, sembunyikan semua role cards
+      if (!username) {
         roleCardsContainer.innerHTML = `
-          <div class="role-card" onclick="selectRole('Administrator')">
-            <div class="role-icon">👨‍💼</div>
-            <div class="role-label">Administrator</div>
-            <input type="radio" name="role" value="Administrator" style="display: none;">
+          <div style="text-align: center; color: #666; padding: 20px; font-style: italic;">
+            Masukkan username terlebih dahulu
           </div>
-          <div class="role-card active" onclick="selectRole('Guru')">
-            <div class="role-icon">👨‍🏫</div>
-            <div class="role-label">Guru</div>
-            <input type="radio" name="role" value="Guru" checked style="display: none;">
+        `;
+        return;
+      }
+
+      // Jika data user belum dimuat, tampilkan loading
+      if (Object.keys(usersData).length === 0) {
+        roleCardsContainer.innerHTML = `
+          <div style="text-align: center; color: #666; padding: 20px; font-style: italic;">
+            <div style="font-size: 20px; margin-bottom: 10px;">⏳</div>
+            Memuat data pengguna...
           </div>
-          <div class="role-card" onclick="selectRole('Wali Kelas')">
-            <div class="role-icon">👨‍🏫</div>
-            <div class="role-label">Wali Kelas</div>
-            <input type="radio" name="role" value="Wali Kelas" style="display: none;">
+        `;
+        return;
+      }
+
+      // Jika username tidak ditemukan di database
+      if (!usersData[username]) {
+        roleCardsContainer.innerHTML = `
+          <div style="text-align: center; color: #f44336; padding: 20px; font-style: italic;">
+            <div style="font-size: 24px; margin-bottom: 10px;">❌</div>
+            Username tidak ditemukan
           </div>
         `;
         return;
@@ -5830,5 +5819,5 @@
       }
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'993f0203922d89a1',t:'MTc2MTM2NjkzMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'993f0895c102efdf',t:'MTc2MTM2NzIwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
