@@ -1538,13 +1538,15 @@
      <p class="page-subtitle">Laporan kehadiran siswa dalam rentang waktu tertentu</p>
     </div>
     <div class="content-card">
-     <div class="filter-section">
-      <div class="form-group-inline"><label>Kelas</label> <select id="kelasRekapAbsensi" class="form-select"> <option value="">Semua Kelas</option> <option value="VII A">VII A</option> <option value="VII B">VII B</option> <option value="VIII A">VIII A</option> <option value="VIII B">VIII B</option> <option value="IX A">IX A</option> <option value="IX B">IX B</option> </select>
-      </div>
-      <div class="form-group-inline"><label>Guru</label> <select id="guruRekapAbsensi" class="form-select"> <option value="">Semua Guru</option> <option value="Ahmad Fauzi, S.Pd">Ahmad Fauzi, S.Pd</option> <option value="Siti Nurhaliza, S.Pd">Siti Nurhaliza, S.Pd</option> <option value="Budi Setiawan, S.Pd">Budi Setiawan, S.Pd</option> </select>
-      </div>
-      <div class="form-group-inline"><label>Mata Pelajaran</label> <select id="mapelRekapAbsensi" class="form-select"> <option value="">Semua Mapel</option> <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option> <option value="Matematika">Matematika</option> <option value="Bahasa Indonesia">Bahasa Indonesia</option> <option value="Bahasa Inggris">Bahasa Inggris</option> <option value="IPA">IPA</option> <option value="IPS">IPS</option> </select>
-      </div><!-- Row 4: Tanggal Awal dan Tanggal Akhir -->
+     <div class="filter-section"><!-- Row 1: Kelas dan Mata Pelajaran -->
+      <div class="form-row">
+       <div class="form-group-inline form-half"><label>Kelas</label> <select id="kelasRekapAbsensi" class="form-select form-compact"> <option value="">Semua Kelas</option> <option value="VII A">VII A</option> <option value="VII B">VII B</option> <option value="VIII A">VIII A</option> <option value="VIII B">VIII B</option> <option value="IX A">IX A</option> <option value="IX B">IX B</option> </select>
+       </div>
+       <div class="form-group-inline form-half"><label>Mata Pelajaran</label> <select id="mapelRekapAbsensi" class="form-select form-compact"> <option value="">Semua Mapel</option> <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option> <option value="Matematika">Matematika</option> <option value="Bahasa Indonesia">Bahasa Indonesia</option> <option value="Bahasa Inggris">Bahasa Inggris</option> <option value="IPA">IPA</option> <option value="IPS">IPS</option> </select>
+       </div>
+      </div><!-- Row 2: Guru (full width) -->
+      <div class="form-group-inline"><label>Guru</label> <select id="guruRekapAbsensi" class="form-select form-compact"> <option value="">Semua Guru</option> <option value="Ahmad Fauzi, S.Pd">Ahmad Fauzi, S.Pd</option> <option value="Siti Nurhaliza, S.Pd">Siti Nurhaliza, S.Pd</option> <option value="Budi Setiawan, S.Pd">Budi Setiawan, S.Pd</option> </select>
+      </div><!-- Row 3: Tanggal Awal dan Tanggal Akhir -->
       <div class="form-row">
        <div class="form-group-inline form-half"><label>Tanggal Awal</label> <input type="date" id="tanggalAwalAbsensi" class="form-input-inline form-compact">
        </div>
@@ -1651,13 +1653,15 @@
      <p class="page-subtitle">Laporan kegiatan pembelajaran</p>
     </div>
     <div class="content-card">
-     <div class="filter-section">
-      <div class="form-group-inline"><label>Kelas</label> <select id="kelasRekapJurnal" class="form-select"> <option value="">Semua Kelas</option> <option value="VII A">VII A</option> <option value="VII B">VII B</option> <option value="VIII A">VIII A</option> <option value="VIII B">VIII B</option> <option value="IX A">IX A</option> <option value="IX B">IX B</option> </select>
-      </div>
-      <div class="form-group-inline"><label>Guru</label> <select id="guruRekapJurnal" class="form-select"> <option value="">Semua Guru</option> <option value="Ahmad Fauzi, S.Pd">Ahmad Fauzi, S.Pd</option> <option value="Siti Nurhaliza, S.Pd">Siti Nurhaliza, S.Pd</option> <option value="Budi Setiawan, S.Pd">Budi Setiawan, S.Pd</option> </select>
-      </div>
-      <div class="form-group-inline"><label>Mata Pelajaran</label> <select id="mapelRekapJurnal" class="form-select"> <option value="">Semua Mapel</option> <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option> <option value="Matematika">Matematika</option> <option value="Bahasa Indonesia">Bahasa Indonesia</option> <option value="Bahasa Inggris">Bahasa Inggris</option> <option value="IPA">IPA</option> <option value="IPS">IPS</option> </select>
-      </div><!-- Row 4: Tanggal Awal dan Tanggal Akhir -->
+     <div class="filter-section"><!-- Row 1: Kelas dan Mata Pelajaran -->
+      <div class="form-row">
+       <div class="form-group-inline form-half"><label>Kelas</label> <select id="kelasRekapJurnal" class="form-select form-compact"> <option value="">Semua Kelas</option> <option value="VII A">VII A</option> <option value="VII B">VII B</option> <option value="VIII A">VIII A</option> <option value="VIII B">VIII B</option> <option value="IX A">IX A</option> <option value="IX B">IX B</option> </select>
+       </div>
+       <div class="form-group-inline form-half"><label>Mata Pelajaran</label> <select id="mapelRekapJurnal" class="form-select form-compact"> <option value="">Semua Mapel</option> <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option> <option value="Matematika">Matematika</option> <option value="Bahasa Indonesia">Bahasa Indonesia</option> <option value="Bahasa Inggris">Bahasa Inggris</option> <option value="IPA">IPA</option> <option value="IPS">IPS</option> </select>
+       </div>
+      </div><!-- Row 2: Guru (full width) -->
+      <div class="form-group-inline"><label>Guru</label> <select id="guruRekapJurnal" class="form-select form-compact"> <option value="">Semua Guru</option> <option value="Ahmad Fauzi, S.Pd">Ahmad Fauzi, S.Pd</option> <option value="Siti Nurhaliza, S.Pd">Siti Nurhaliza, S.Pd</option> <option value="Budi Setiawan, S.Pd">Budi Setiawan, S.Pd</option> </select>
+      </div><!-- Row 3: Tanggal Awal dan Tanggal Akhir -->
       <div class="form-row">
        <div class="form-group-inline form-half"><label>Tanggal Awal</label> <input type="date" id="tanggalAwalJurnal" class="form-input-inline form-compact">
        </div>
@@ -5917,5 +5921,5 @@
       }
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'998bfd68132ff8f0',t:'MTc2MjE3NDE0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'998c03fde3aa3f31',t:'MTc2MjE3NDQxNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
