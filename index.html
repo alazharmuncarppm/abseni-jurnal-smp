@@ -951,6 +951,7 @@
         display: inline-block;
         width: calc(50% - 4px);
         vertical-align: top;
+        min-width: 140px;
       }
 
       #rekapAbsensiContent .filter-section .form-group-inline:nth-child(4) {
@@ -975,6 +976,7 @@
         display: inline-block;
         width: calc(50% - 4px);
         vertical-align: top;
+        min-width: 140px;
       }
 
       #rekapJurnalContent .filter-section .form-group-inline:nth-child(4) {
@@ -1015,6 +1017,15 @@
         background-size: 12px;
         background-position: right 6px center;
         padding-right: 24px;
+        min-width: 120px;
+      }
+
+      /* Khusus untuk input tanggal, buat lebih lebar agar tahun terbaca */
+      #rekapAbsensiContent input[type="date"],
+      #rekapJurnalContent input[type="date"] {
+        min-width: 135px;
+        font-size: 10px;
+        padding: 6px 4px;
       }
 
       /* Override for absensi, jurnal, and nilai form layout on mobile */
@@ -5921,5 +5932,5 @@
       }
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'998c03fde3aa3f31',t:'MTc2MjE3NDQxNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'998c0c37936f8357',t:'MTc2MjE3NDc1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
