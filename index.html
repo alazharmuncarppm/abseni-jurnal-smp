@@ -1544,10 +1544,12 @@
       <div class="form-group-inline"><label>Guru</label> <select id="guruRekapAbsensi" class="form-select"> <option value="">Semua Guru</option> <option value="Ahmad Fauzi, S.Pd">Ahmad Fauzi, S.Pd</option> <option value="Siti Nurhaliza, S.Pd">Siti Nurhaliza, S.Pd</option> <option value="Budi Setiawan, S.Pd">Budi Setiawan, S.Pd</option> </select>
       </div>
       <div class="form-group-inline"><label>Mata Pelajaran</label> <select id="mapelRekapAbsensi" class="form-select"> <option value="">Semua Mapel</option> <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option> <option value="Matematika">Matematika</option> <option value="Bahasa Indonesia">Bahasa Indonesia</option> <option value="Bahasa Inggris">Bahasa Inggris</option> <option value="IPA">IPA</option> <option value="IPS">IPS</option> </select>
-      </div>
-      <div class="form-group-inline"><label>Tanggal Awal</label> <input type="date" id="tanggalAwalAbsensi" class="form-input-inline">
-      </div>
-      <div class="form-group-inline"><label>Tanggal Akhir</label> <input type="date" id="tanggalAkhirAbsensi" class="form-input-inline">
+      </div><!-- Row 4: Tanggal Awal dan Tanggal Akhir -->
+      <div class="form-row">
+       <div class="form-group-inline form-half"><label>Tanggal Awal</label> <input type="date" id="tanggalAwalAbsensi" class="form-input-inline form-compact">
+       </div>
+       <div class="form-group-inline form-half"><label>Tanggal Akhir</label> <input type="date" id="tanggalAkhirAbsensi" class="form-input-inline form-compact">
+       </div>
       </div>
      </div>
      <div class="action-buttons"><button class="btn btn-primary" onclick="filterAttendanceReport()"> Filter Data </button> <button class="btn btn-info" onclick="showAttendanceStats()"> Statistik </button> <button class="btn btn-warning" onclick="toggleReportView()" id="toggleViewBtn"> Tampilan Ringkas </button> <button class="btn btn-danger" onclick="downloadPDF('absensi')"> Download PDF </button>
@@ -1655,10 +1657,12 @@
       <div class="form-group-inline"><label>Guru</label> <select id="guruRekapJurnal" class="form-select"> <option value="">Semua Guru</option> <option value="Ahmad Fauzi, S.Pd">Ahmad Fauzi, S.Pd</option> <option value="Siti Nurhaliza, S.Pd">Siti Nurhaliza, S.Pd</option> <option value="Budi Setiawan, S.Pd">Budi Setiawan, S.Pd</option> </select>
       </div>
       <div class="form-group-inline"><label>Mata Pelajaran</label> <select id="mapelRekapJurnal" class="form-select"> <option value="">Semua Mapel</option> <option value="Pendidikan Agama Islam">Pendidikan Agama Islam</option> <option value="Matematika">Matematika</option> <option value="Bahasa Indonesia">Bahasa Indonesia</option> <option value="Bahasa Inggris">Bahasa Inggris</option> <option value="IPA">IPA</option> <option value="IPS">IPS</option> </select>
-      </div>
-      <div class="form-group-inline"><label>Tanggal Awal</label> <input type="date" id="tanggalAwalJurnal" class="form-input-inline">
-      </div>
-      <div class="form-group-inline"><label>Tanggal Akhir</label> <input type="date" id="tanggalAkhirJurnal" class="form-input-inline">
+      </div><!-- Row 4: Tanggal Awal dan Tanggal Akhir -->
+      <div class="form-row">
+       <div class="form-group-inline form-half"><label>Tanggal Awal</label> <input type="date" id="tanggalAwalJurnal" class="form-input-inline form-compact">
+       </div>
+       <div class="form-group-inline form-half"><label>Tanggal Akhir</label> <input type="date" id="tanggalAkhirJurnal" class="form-input-inline form-compact">
+       </div>
       </div>
      </div>
      <div class="action-buttons"><button class="btn btn-primary" onclick="filterJournalReport()"> Filter Data </button> <button class="btn btn-danger" onclick="downloadPDF('jurnal')"> Download PDF </button>
@@ -5913,5 +5917,5 @@
       }
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'998bf1a350b0f8f0',t:'MTc2MjE3MzY2Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'998bfd68132ff8f0',t:'MTc2MjE3NDE0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
