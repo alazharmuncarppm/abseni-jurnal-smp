@@ -924,6 +924,95 @@
         gap: 10px;
       }
 
+      /* Special mobile layout for Rekap pages */
+      #rekapAbsensiContent .filter-section,
+      #rekapJurnalContent .filter-section,
+      #rekapNilaiContent .filter-section {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      /* Row layout for specific form pairs in Rekap pages */
+      #rekapAbsensiContent .filter-section .form-group-inline:nth-child(1),
+      #rekapAbsensiContent .filter-section .form-group-inline:nth-child(2) {
+        display: inline-block;
+        width: calc(50% - 4px);
+        vertical-align: top;
+      }
+
+      #rekapAbsensiContent .filter-section .form-group-inline:nth-child(1) {
+        margin-right: 8px;
+      }
+
+      #rekapAbsensiContent .filter-section .form-group-inline:nth-child(4),
+      #rekapAbsensiContent .filter-section .form-group-inline:nth-child(5) {
+        display: inline-block;
+        width: calc(50% - 4px);
+        vertical-align: top;
+      }
+
+      #rekapAbsensiContent .filter-section .form-group-inline:nth-child(4) {
+        margin-right: 8px;
+      }
+
+      #rekapJurnalContent .filter-section .form-group-inline:nth-child(1),
+      #rekapJurnalContent .filter-section .form-group-inline:nth-child(2) {
+        display: inline-block;
+        width: calc(50% - 4px);
+        vertical-align: top;
+      }
+
+      #rekapJurnalContent .filter-section .form-group-inline:nth-child(1) {
+        margin-right: 8px;
+      }
+
+      #rekapJurnalContent .filter-section .form-group-inline:nth-child(4),
+      #rekapJurnalContent .filter-section .form-group-inline:nth-child(5) {
+        display: inline-block;
+        width: calc(50% - 4px);
+        vertical-align: top;
+      }
+
+      #rekapJurnalContent .filter-section .form-group-inline:nth-child(4) {
+        margin-right: 8px;
+      }
+
+      #rekapNilaiContent .filter-section .form-group-inline:nth-child(1),
+      #rekapNilaiContent .filter-section .form-group-inline:nth-child(2) {
+        display: inline-block;
+        width: calc(50% - 4px);
+        vertical-align: top;
+      }
+
+      #rekapNilaiContent .filter-section .form-group-inline:nth-child(1) {
+        margin-right: 8px;
+      }
+
+      /* Smaller form elements for Rekap pages on mobile */
+      #rekapAbsensiContent .form-group-inline label,
+      #rekapJurnalContent .form-group-inline label,
+      #rekapNilaiContent .form-group-inline label {
+        font-size: 11px;
+        margin-bottom: 3px;
+        font-weight: 600;
+      }
+
+      #rekapAbsensiContent .form-select,
+      #rekapAbsensiContent .form-input-inline,
+      #rekapJurnalContent .form-select,
+      #rekapJurnalContent .form-input-inline,
+      #rekapNilaiContent .form-select,
+      #rekapNilaiContent .form-input-inline {
+        padding: 6px 8px;
+        font-size: 11px;
+        border-radius: 6px;
+        border: 1px solid #e1e5e9;
+        background-size: 12px;
+        background-position: right 6px center;
+        padding-right: 24px;
+      }
+
       /* Override for absensi, jurnal, and nilai form layout on mobile */
       .absensi-form-layout,
       .jurnal-form-layout,
@@ -5820,5 +5909,5 @@
       }
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'993f140df18d3fd0',t:'MTc2MTM2NzY3Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'998bd3adb13ffd6b',t:'MTc2MjE3MjQzOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
