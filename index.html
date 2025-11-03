@@ -843,15 +843,18 @@
       }
 
       .header-info h2 {
-        font-size: 14px;
+        font-size: 11px;
+        line-height: 1.2;
       }
       
       .header-info p {
-        font-size: 11px;
+        font-size: 9px;
+        line-height: 1.1;
       }
       
       .user-info {
-        font-size: 12px;
+        font-size: 10px;
+        line-height: 1.2;
       }
       
       .logout-btn {
@@ -1181,7 +1184,18 @@
       }
       
       .header-info h2 {
-        font-size: 13px;
+        font-size: 10px;
+        line-height: 1.1;
+      }
+      
+      .header-info p {
+        font-size: 8px;
+        line-height: 1.0;
+      }
+      
+      .user-info {
+        font-size: 9px;
+        line-height: 1.1;
       }
       
       .greeting-box h1 {
@@ -3941,12 +3955,16 @@
       loadGradesReportData();
       
       // Set today's date for all date inputs (except report date ranges)
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date();
+      // Adjust for timezone to get correct local date
+      const localToday = new Date(today.getTime() - (today.getTimezoneOffset() * 60000));
+      const todayStr = localToday.toISOString().split('T')[0];
+      
       const dateInputs = document.querySelectorAll('input[type="date"]');
       dateInputs.forEach(input => {
         // Skip report date range inputs - they will be set by setDefaultDateRange()
         if (!input.id.includes('tanggalAwal') && !input.id.includes('tanggalAkhir')) {
-          input.value = today;
+          input.value = todayStr;
         }
       });
 
@@ -3955,7 +3973,7 @@
       formDateInputs.forEach(inputId => {
         const input = document.getElementById(inputId);
         if (input) {
-          input.value = today;
+          input.value = todayStr;
         }
       });
 
@@ -4307,14 +4325,18 @@
           populateTeacherForms();
           
           // Set today's date for form inputs
-          const today = new Date().toISOString().split('T')[0];
+          const today = new Date();
+          // Adjust for timezone to get correct local date
+          const localToday = new Date(today.getTime() - (today.getTimezoneOffset() * 60000));
+          const todayStr = localToday.toISOString().split('T')[0];
+          
           if (targetPage === 'absensi') {
             const tanggalAbsensi = document.getElementById('tanggalAbsensi');
-            if (tanggalAbsensi) tanggalAbsensi.value = today;
+            if (tanggalAbsensi) tanggalAbsensi.value = todayStr;
           }
           if (targetPage === 'jurnal') {
             const tanggalJurnal = document.getElementById('tanggalJurnal');
-            if (tanggalJurnal) tanggalJurnal.value = today;
+            if (tanggalJurnal) tanggalJurnal.value = todayStr;
           }
           
           // Force re-populate absensi form if on absensi page
@@ -4968,7 +4990,11 @@
         // Reset form completely
         document.getElementById('kelasAbsensi').value = '';
         document.getElementById('jamAbsensi').value = 'Jam 1-2';
-        document.getElementById('tanggalAbsensi').value = new Date().toISOString().split('T')[0];
+        
+        // Set today's date with timezone adjustment
+        const today = new Date();
+        const localToday = new Date(today.getTime() - (today.getTimezoneOffset() * 60000));
+        document.getElementById('tanggalAbsensi').value = localToday.toISOString().split('T')[0];
         
         // Clear student list
         const studentListContainer = document.getElementById('studentList');
@@ -5456,7 +5482,9 @@
           showSimpleSuccessNotification('✅ Jurnal berhasil disimpan!');
           
           // Reset form completely
-          document.getElementById('tanggalJurnal').value = new Date().toISOString().split('T')[0];
+          const today = new Date();
+          const localToday = new Date(today.getTime() - (today.getTimezoneOffset() * 60000));
+          document.getElementById('tanggalJurnal').value = localToday.toISOString().split('T')[0];
           document.getElementById('kelasJurnal').value = '';
           document.getElementById('jamJurnal').value = 'Jam 1-2';
           document.getElementById('materiJurnal').value = '';
@@ -6577,5 +6605,5 @@
       }
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'998fa8be3076ca4b',t:'MTc2MjIxMjYyMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'998fc128636aa023',t:'MTc2MjIxMzYyMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
