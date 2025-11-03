@@ -790,6 +790,14 @@
       display: block;
     }
 
+    /* Mobile-specific button styling */
+    @media (max-width: 768px) {
+      #toggleViewBtn {
+        white-space: normal !important;
+        line-height: 1.2 !important;
+      }
+    }
+
     /* Mobile Responsive Design */
     @media (max-width: 768px) {
       .login-container {
@@ -1565,7 +1573,8 @@
        </div>
       </div>
      </div>
-     <div class="action-buttons"><button class="btn btn-primary" onclick="filterAttendanceReport()"> Filter Data </button> <button class="btn btn-info" onclick="showAttendanceStats()"> Statistik </button> <button class="btn btn-warning" onclick="toggleReportView()" id="toggleViewBtn"> Tampilan Ringkas </button> <button class="btn btn-danger" onclick="downloadPDF('absensi')"> Download PDF </button>
+     <div class="action-buttons"><button class="btn btn-primary" onclick="filterAttendanceReport()"> Filter Data </button> <button class="btn btn-info" onclick="showAttendanceStats()"> Statistik </button> <button class="btn btn-warning" onclick="toggleReportView()" id="toggleViewBtn" style="white-space: normal; line-height: 1.2; height: auto; min-height: 40px;"> Tampilan<br>
+       Ringkas </button> <button class="btn btn-danger" onclick="downloadPDF('absensi')"> Download PDF </button>
      </div>
     </div>
     <div class="stats-grid" id="attendanceStatsGrid">
@@ -5047,12 +5056,12 @@
         // Switch to detailed view
         detailedView.classList.remove('hidden');
         summaryView.classList.add('hidden');
-        toggleBtn.innerHTML = 'Tampilan Ringkas';
+        toggleBtn.innerHTML = 'Tampilan<br>Ringkas';
       } else {
         // Switch to summary view
         detailedView.classList.add('hidden');
         summaryView.classList.remove('hidden');
-        toggleBtn.innerHTML = 'Tampilan Rinci';
+        toggleBtn.innerHTML = 'Tampilan<br>Rinci';
         
         // Update summary view with current filtered data
         const kelas = document.getElementById('kelasRekapAbsensi').value;
@@ -5932,5 +5941,5 @@
       }
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'998c0c37936f8357',t:'MTc2MjE3NDc1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'998c16f0a028407f',t:'MTc2MjE3NTE5NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
