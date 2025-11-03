@@ -2118,63 +2118,194 @@
         const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSi_oxcUsjmD0EwTQo3j9Mj-DLvPPQhk3nGJbjOijO1vdAV4jkTiT68yVnvTMA54vy-BEXUmG_7UJw4/pub?gid=0&single=true&output=csv');
         const csvText = await response.text();
         
-        // Parse CSV data
-        const lines = csvText.split('\n');
-        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        console.log('Raw student CSV data (first 2000 chars):', csvText.substring(0, 2000)); // Debug log
+        console.log('Total CSV length:', csvText.length); // Debug log
         
-        studentsData = {};
+        // Parse CSV data with enhanced handling
+        const lines = csvText.split(/\r?\n/).filter(line => line.trim()); // Handle both \n and \r\n
+        console.log('Total lines found:', lines.length); // Debug log
         
-        for (let i = 1; i < lines.length; i++) {
-          const line = lines[i].trim();
-          if (!line) continue;
-          
-          // Parse CSV line with proper handling of quoted fields
-          const values = parseCSVLine(line);
-          if (values.length < headers.length) continue;
-          
-          const studentData = {};
-          headers.forEach((header, index) => {
-            studentData[header] = values[index] ? values[index].trim().replace(/"/g, '') : '';
-          });
-          
-          // Group students by class
-          if (studentData.NIS && studentData['Nama Lengkap'] && studentData.Kelas) {
-            const kelas = studentData.Kelas;
-            
-            if (!studentsData[kelas]) {
-              studentsData[kelas] = [];
-            }
-            
-            studentsData[kelas].push({
-              nis: studentData.NIS,
-              nama: studentData['Nama Lengkap'],
-              lp: studentData['L/P'] || 'L'
-            });
-          }
+        if (lines.length === 0) {
+          throw new Error('No data lines found in CSV');
         }
         
-        // Sort students by name in each class
-        Object.keys(studentsData).forEach(kelas => {
-          studentsData[kelas].sort((a, b) => a.nama.localeCompare(b.nama));
+        // Parse headers more carefully
+        const headerLine = lines[0];
+        console.log('Raw header line:', headerLine); // Debug log
+        
+        const headers = parseCSVLineAdvanced(headerLine).map(h => h.trim().replace(/^"|"$/g, ''));
+        console.log('Parsed headers:', headers); // Debug log
+        
+        // Validate required columns with flexible matching
+        const requiredColumns = ['Nama Lengkap', 'L/P', 'Kelas'];
+        const headerMap = {};
+        
+        // Create flexible header mapping
+        headers.forEach((header, index) => {
+          const cleanHeader = header.toLowerCase().replace(/[^a-z]/g, '');
+          if (cleanHeader.includes('namalengkap') || cleanHeader.includes('nama')) {
+            headerMap['Nama Lengkap'] = index;
+          } else if (cleanHeader.includes('lp') || cleanHeader.includes('jeniskelamin') || cleanHeader.includes('kelamin')) {
+            headerMap['L/P'] = index;
+          } else if (cleanHeader.includes('kelas')) {
+            headerMap['Kelas'] = index;
+          } else if (cleanHeader.includes('nis') || cleanHeader.includes('nomor')) {
+            headerMap['NIS'] = index;
+          }
         });
         
-        console.log('Loaded students by class:', Object.keys(studentsData));
-        console.log('Total students:', Object.values(studentsData).reduce((total, students) => total + students.length, 0));
+        console.log('Header mapping:', headerMap); // Debug log
+        
+        // Check if we found all required columns
+        const missingColumns = requiredColumns.filter(col => headerMap[col] === undefined);
+        if (missingColumns.length > 0) {
+          console.error('Missing required columns:', missingColumns);
+          console.log('Available headers:', headers);
+          console.log('Header mapping result:', headerMap);
+          throw new Error(`Missing required columns: ${missingColumns.join(', ')}`);
+        }
+        
+        studentsData = {};
+        let totalStudentsProcessed = 0;
+        let skippedLines = 0;
+        
+        // Process each data line with enhanced parsing
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i].trim();
+          if (!line) {
+            skippedLines++;
+            continue;
+          }
+          
+          console.log(`Processing line ${i}:`, line.substring(0, 200) + (line.length > 200 ? '...' : '')); // Debug log (truncated)
+          
+          // Parse CSV line with advanced handling
+          const values = parseCSVLineAdvanced(line);
+          console.log(`Parsed values for line ${i} (count: ${values.length}):`, values); // Debug log
+          
+          if (values.length < Math.max(...Object.values(headerMap)) + 1) {
+            console.log(`Skipping incomplete line ${i} - expected at least ${Math.max(...Object.values(headerMap)) + 1} values, got ${values.length}`);
+            skippedLines++;
+            continue;
+          }
+          
+          // Extract data using header mapping
+          const namaLengkap = values[headerMap['Nama Lengkap']] ? values[headerMap['Nama Lengkap']].trim().replace(/^"|"$/g, '') : '';
+          const kelas = values[headerMap['Kelas']] ? values[headerMap['Kelas']].trim().replace(/^"|"$/g, '') : '';
+          const jenisKelamin = values[headerMap['L/P']] ? values[headerMap['L/P']].trim().replace(/^"|"$/g, '') : '';
+          const nis = headerMap['NIS'] !== undefined && values[headerMap['NIS']] ? values[headerMap['NIS']].trim().replace(/^"|"$/g, '') : '';
+          
+          console.log(`Extracted data for line ${i}:`, {
+            namaLengkap,
+            kelas,
+            jenisKelamin,
+            nis
+          }); // Debug log
+          
+          // Validate required fields with more lenient checking
+          if (!namaLengkap || namaLengkap.length < 2) {
+            console.log(`Skipping line ${i} - invalid name: "${namaLengkap}"`);
+            skippedLines++;
+            continue;
+          }
+          
+          if (!kelas || kelas.length < 1) {
+            console.log(`Skipping line ${i} - invalid class: "${kelas}"`);
+            skippedLines++;
+            continue;
+          }
+          
+          // Clean and validate data
+          const cleanKelas = kelas.trim();
+          const cleanNama = namaLengkap.trim();
+          const cleanJenisKelamin = jenisKelamin && (jenisKelamin.toUpperCase() === 'P' || jenisKelamin.toLowerCase().includes('perempuan')) ? 'P' : 'L';
+          
+          // Initialize class array if not exists
+          if (!studentsData[cleanKelas]) {
+            studentsData[cleanKelas] = [];
+            console.log(`Created new class group: "${cleanKelas}"`);
+          }
+          
+          // Check for duplicate names in the same class
+          const isDuplicate = studentsData[cleanKelas].some(student => 
+            student.nama.toLowerCase() === cleanNama.toLowerCase()
+          );
+          
+          if (isDuplicate) {
+            console.log(`Skipping duplicate student: "${cleanNama}" in class "${cleanKelas}"`);
+            skippedLines++;
+            continue;
+          }
+          
+          // Generate NIS if not available
+          const finalNis = nis || `${cleanKelas.replace(/\s+/g, '')}_${String(studentsData[cleanKelas].length + 1).padStart(3, '0')}`;
+          
+          // Add student to class
+          const studentRecord = {
+            nis: finalNis,
+            nama: cleanNama,
+            lp: cleanJenisKelamin
+          };
+          
+          studentsData[cleanKelas].push(studentRecord);
+          totalStudentsProcessed++;
+          
+          console.log(`✓ Added student ${totalStudentsProcessed}: "${cleanNama}" to class "${cleanKelas}" (${cleanJenisKelamin}) - NIS: ${finalNis}`);
+        }
+        
+        // Sort students alphabetically by name in each class
+        Object.keys(studentsData).forEach(kelas => {
+          const originalCount = studentsData[kelas].length;
+          studentsData[kelas].sort((a, b) => a.nama.localeCompare(b.nama, 'id', { sensitivity: 'base' }));
+          console.log(`✓ Sorted ${originalCount} students in class "${kelas}"`);
+          console.log(`Students in ${kelas}:`, studentsData[kelas].map((s, idx) => `${idx + 1}. ${s.nama}`));
+        });
+        
+        // Final summary
+        console.log('=== FINAL STUDENT DATA LOADING SUMMARY ===');
+        console.log('✓ Total lines processed:', lines.length - 1);
+        console.log('✓ Students successfully loaded:', totalStudentsProcessed);
+        console.log('✗ Lines skipped:', skippedLines);
+        console.log('✓ Classes found:', Object.keys(studentsData).length);
+        console.log('✓ Class list:', Object.keys(studentsData).sort());
+        
+        Object.keys(studentsData).sort().forEach(kelas => {
+          console.log(`  📚 ${kelas}: ${studentsData[kelas].length} students`);
+          studentsData[kelas].forEach((student, idx) => {
+            console.log(`    ${idx + 1}. ${student.nama} (${student.lp}) - NIS: ${student.nis}`);
+          });
+        });
+        console.log('=== END SUMMARY ===');
         
         // Populate dropdowns after loading data
         populateClassDropdowns();
         
+        if (totalStudentsProcessed === 0) {
+          console.warn('No students loaded from Google Sheets - using fallback data');
+          throw new Error('No students found in the sheet');
+        }
+        
       } catch (error) {
         console.error('Error loading students:', error);
-        alert('Gagal memuat data siswa. Menggunakan data default.');
+        alert(`Gagal memuat data siswa dari Google Sheets: ${error.message}\n\nMenggunakan data default untuk testing.`);
         
         // Fallback to default data if loading fails
         studentsData = {
           'VII A': [
             { nis: '2024001', nama: 'Ahmad Fauzi', lp: 'L' },
-            { nis: '2024002', nama: 'Siti Nurhaliza', lp: 'P' }
+            { nis: '2024002', nama: 'Siti Nurhaliza', lp: 'P' },
+            { nis: '2024003', nama: 'Budi Setiawan', lp: 'L' },
+            { nis: '2024004', nama: 'Dewi Sartika', lp: 'P' },
+            { nis: '2024005', nama: 'Eko Prasetyo', lp: 'L' }
+          ],
+          'VII B': [
+            { nis: '2024006', nama: 'Fatimah Zahra', lp: 'P' },
+            { nis: '2024007', nama: 'Galih Pratama', lp: 'L' },
+            { nis: '2024008', nama: 'Hana Safitri', lp: 'P' }
           ]
         };
+        
+        console.log('Using fallback student data:', studentsData);
         
         // Populate dropdowns with fallback data
         populateClassDropdowns();
@@ -2183,27 +2314,110 @@
       }
     }
 
-    // Parse CSV line with proper handling of quoted fields
+    // Parse CSV line with proper handling of quoted fields and edge cases
     function parseCSVLine(line) {
       const result = [];
       let current = '';
       let inQuotes = false;
+      let i = 0;
       
-      for (let i = 0; i < line.length; i++) {
+      while (i < line.length) {
         const char = line[i];
         
         if (char === '"') {
-          inQuotes = !inQuotes;
+          // Handle escaped quotes (double quotes)
+          if (inQuotes && i + 1 < line.length && line[i + 1] === '"') {
+            current += '"';
+            i += 2; // Skip both quotes
+            continue;
+          } else {
+            inQuotes = !inQuotes;
+          }
         } else if (char === ',' && !inQuotes) {
-          result.push(current);
+          result.push(current.trim());
           current = '';
         } else {
           current += char;
         }
+        
+        i++;
       }
       
-      result.push(current);
-      return result;
+      // Add the last field
+      result.push(current.trim());
+      
+      // Clean up the results - remove surrounding quotes and trim
+      return result.map(field => {
+        field = field.trim();
+        // Remove surrounding quotes if they exist
+        if (field.startsWith('"') && field.endsWith('"')) {
+          field = field.slice(1, -1);
+        }
+        return field.trim();
+      });
+    }
+
+    // Advanced CSV parsing function with better handling of complex cases
+    function parseCSVLineAdvanced(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      let quoteChar = null; // Track which quote character we're using
+      let i = 0;
+      
+      // Handle different line endings and clean the line
+      line = line.replace(/\r$/, '').trim();
+      
+      while (i < line.length) {
+        const char = line[i];
+        const nextChar = i + 1 < line.length ? line[i + 1] : null;
+        
+        // Handle quote characters (both single and double quotes)
+        if ((char === '"' || char === "'") && !inQuotes) {
+          // Starting a quoted section
+          inQuotes = true;
+          quoteChar = char;
+        } else if (char === quoteChar && inQuotes) {
+          // Check for escaped quotes (double quotes)
+          if (nextChar === quoteChar) {
+            current += char;
+            i += 2; // Skip both quotes
+            continue;
+          } else {
+            // End of quoted section
+            inQuotes = false;
+            quoteChar = null;
+          }
+        } else if (char === ',' && !inQuotes) {
+          // Field separator outside of quotes
+          result.push(current.trim());
+          current = '';
+        } else {
+          // Regular character
+          current += char;
+        }
+        
+        i++;
+      }
+      
+      // Add the last field
+      result.push(current.trim());
+      
+      // Clean up the results
+      return result.map(field => {
+        field = field.trim();
+        
+        // Remove surrounding quotes if they exist (handle both single and double quotes)
+        if ((field.startsWith('"') && field.endsWith('"')) || 
+            (field.startsWith("'") && field.endsWith("'"))) {
+          field = field.slice(1, -1);
+        }
+        
+        // Handle escaped quotes within the field
+        field = field.replace(/""/g, '"').replace(/''/g, "'");
+        
+        return field.trim();
+      });
     }
 
     // Load attendance report data from Google Sheets
@@ -2213,51 +2427,116 @@
       isLoadingAttendanceReport = true;
       
       try {
+        console.log('=== LOADING ATTENDANCE REPORT DATA ===');
         const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQYfSiGvS7RVqD6nxBEKSpXAJ9w1n8e0sEfbTtFeV4wDLxF1bk_vgCWt7zuXK9nfKLkPxDQg7A8MbPj/pub?gid=0&single=true&output=csv');
-        const csvText = await response.text();
         
-        // Parse CSV data
-        const lines = csvText.split('\n');
-        const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const csvText = await response.text();
+        console.log('Raw attendance CSV data (first 1000 chars):', csvText.substring(0, 1000));
+        
+        if (!csvText || csvText.trim().length === 0) {
+          throw new Error('Empty CSV response received');
+        }
+        
+        // Parse CSV data with enhanced handling
+        const lines = csvText.split(/\r?\n/).filter(line => line.trim());
+        console.log('Total attendance CSV lines:', lines.length);
+        
+        if (lines.length === 0) {
+          throw new Error('No data lines found in attendance CSV');
+        }
+        
+        // Parse headers more carefully
+        const headerLine = lines[0];
+        console.log('Raw attendance header line:', headerLine);
+        
+        const headers = parseCSVLineAdvanced(headerLine).map(h => h.trim().replace(/^"|"$/g, ''));
+        console.log('Parsed attendance CSV Headers:', headers);
+        
+        if (headers.length === 0) {
+          throw new Error('No headers found in attendance CSV');
+        }
         
         attendanceReportData = [];
-        
-        console.log('Attendance CSV Headers:', headers);
+        let processedRecords = 0;
+        let skippedRecords = 0;
         
         for (let i = 1; i < lines.length; i++) {
           const line = lines[i].trim();
-          if (!line) continue;
+          if (!line) {
+            skippedRecords++;
+            continue;
+          }
           
-          const values = parseCSVLine(line);
-          if (values.length < headers.length) continue;
+          console.log(`Processing attendance line ${i}:`, line.substring(0, 200));
+          
+          const values = parseCSVLineAdvanced(line);
+          console.log(`Parsed attendance values for line ${i}:`, values);
+          
+          if (values.length < headers.length) {
+            console.warn(`Skipping incomplete attendance line ${i} - expected ${headers.length} values, got ${values.length}`);
+            skippedRecords++;
+            continue;
+          }
           
           const attendanceRecord = {};
           headers.forEach((header, index) => {
-            attendanceRecord[header] = values[index] ? values[index].trim().replace(/"/g, '') : '';
+            attendanceRecord[header] = values[index] ? values[index].trim().replace(/^"|"$/g, '') : '';
           });
           
-          // Only add records with required data
-          if (attendanceRecord['Tanggal Absen'] && attendanceRecord['nama Lengkap'] && attendanceRecord['Kelas']) {
-            attendanceReportData.push({
-              tanggal: attendanceRecord['Tanggal Absen'],
-              waktu: attendanceRecord['Waktu'] || '',
-              nis: attendanceRecord['NIS'] || '',
-              nama: attendanceRecord['nama Lengkap'],
-              lp: attendanceRecord['L/P'] || 'L',
-              kelas: attendanceRecord['Kelas'],
-              jam: attendanceRecord['Jam Ke'] || '',
-              mapel: attendanceRecord['Mata Pelajaran'] || '',
-              status: attendanceRecord['Status'] || 'Hadir',
-              keterangan: attendanceRecord['Keterangan'] || '',
-              guru: attendanceRecord['Guru'] || ''
+          console.log(`Attendance record ${i}:`, attendanceRecord);
+          
+          // Check for required fields with flexible matching
+          const tanggalField = attendanceRecord['Tanggal Absen'] || attendanceRecord['Tanggal'] || attendanceRecord['Date'] || '';
+          const namaField = attendanceRecord['nama Lengkap'] || attendanceRecord['Nama Lengkap'] || attendanceRecord['Nama'] || attendanceRecord['Name'] || '';
+          const kelasField = attendanceRecord['Kelas'] || attendanceRecord['Class'] || '';
+          
+          if (!tanggalField || !namaField || !kelasField) {
+            console.warn(`Skipping attendance record ${i} - missing required fields:`, {
+              tanggal: tanggalField,
+              nama: namaField,
+              kelas: kelasField
             });
+            skippedRecords++;
+            continue;
           }
+          
+          // Add to attendance data with normalized field names
+          attendanceReportData.push({
+            tanggal: tanggalField,
+            waktu: attendanceRecord['Waktu'] || attendanceRecord['Time'] || '',
+            nis: attendanceRecord['NIS'] || attendanceRecord['Student ID'] || '',
+            nama: namaField,
+            lp: attendanceRecord['L/P'] || attendanceRecord['Gender'] || 'L',
+            kelas: kelasField,
+            jam: attendanceRecord['Jam Ke'] || attendanceRecord['Period'] || '',
+            mapel: attendanceRecord['Mata Pelajaran'] || attendanceRecord['Subject'] || '',
+            status: attendanceRecord['Status'] || 'Hadir',
+            keterangan: attendanceRecord['Keterangan'] || attendanceRecord['Notes'] || '',
+            guru: attendanceRecord['Guru'] || attendanceRecord['Teacher'] || ''
+          });
+          
+          processedRecords++;
         }
         
-        console.log('Loaded attendance records:', attendanceReportData.length);
+        console.log('=== ATTENDANCE DATA LOADING SUMMARY ===');
+        console.log('✓ Total lines processed:', lines.length - 1);
+        console.log('✓ Records successfully loaded:', processedRecords);
+        console.log('✗ Records skipped:', skippedRecords);
+        console.log('✓ Final attendance records count:', attendanceReportData.length);
+        console.log('=== END ATTENDANCE LOADING ===');
+        
+        if (attendanceReportData.length === 0) {
+          console.warn('No attendance records loaded - using fallback data');
+          throw new Error('No valid attendance records found in the sheet');
+        }
         
       } catch (error) {
         console.error('Error loading attendance report data:', error);
+        console.log('Using fallback attendance data for testing');
         
         // Fallback sample data
         attendanceReportData = [
@@ -2288,6 +2567,8 @@
             guru: 'Siti Nurhaliza, S.Pd'
           }
         ];
+        
+        console.log('Fallback attendance data loaded:', attendanceReportData.length, 'records');
       } finally {
         isLoadingAttendanceReport = false;
       }
@@ -4116,6 +4397,13 @@
       const jam = document.getElementById('jamAbsensi').value;
       const studentListContainer = document.getElementById('studentList');
 
+      console.log('=== LOADING STUDENTS FOR ATTENDANCE ===');
+      console.log('Selected class:', kelas);
+      console.log('Selected date:', tanggal);
+      console.log('Selected time:', jam);
+      console.log('Available classes in studentsData:', Object.keys(studentsData));
+      console.log('Total classes available:', Object.keys(studentsData).length);
+
       if (!kelas) {
         studentListContainer.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Pilih kelas terlebih dahulu</p>';
         return;
@@ -4150,26 +4438,160 @@
         return;
       }
 
+      // Get students for the selected class
       const students = studentsData[kelas] || [];
+      console.log('Raw students found for class', kelas, ':', students.length);
       
-      const studentListHTML = students.map((student, index) => `
-        <div class="student-item" style="padding: 10px 15px;">
-          <div class="student-info">
-            <div class="student-number" style="font-size: 12px;">${index + 1}</div>
-            <div class="student-name" style="font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">${student.nama}</div>
-          </div>
-          <div class="attendance-options" style="display: flex; align-items: center; gap: 8px;">
-            <select class="attendance-dropdown" data-nis="${student.nis}" onchange="selectAttendanceDropdown(this)" style="font-size: 12px; min-width: 90px; max-width: 100px;">
-              <option value="Hadir" selected>Hadir</option>
-              <option value="Sakit">Sakit</option>
-              <option value="Izin">Izin</option>
-              <option value="Alpha">Alpha</option>
-            </select>
-          </div>
-        </div>
-      `).join('');
+      if (students.length > 0) {
+        console.log('First 5 students in class:', students.slice(0, 5).map((s, idx) => `${idx + 1}. ${s.nama} (${s.lp}) - NIS: ${s.nis}`));
+        console.log('Last 5 students in class:', students.slice(-5).map((s, idx) => `${students.length - 4 + idx}. ${s.nama} (${s.lp}) - NIS: ${s.nis}`));
+      }
 
+      if (students.length === 0) {
+        console.warn('No students found for class:', kelas);
+        console.log('Available classes with student counts:');
+        Object.keys(studentsData).forEach(className => {
+          console.log(`  - ${className}: ${studentsData[className].length} students`);
+        });
+        
+        studentListContainer.innerHTML = `
+          <div style="text-align: center; padding: 30px; background: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; margin: 10px 0;">
+            <div style="font-size: 48px; margin-bottom: 15px;">⚠️</div>
+            <h3 style="color: #856404; margin: 0 0 10px 0;">Tidak Ada Data Siswa!</h3>
+            <p style="color: #856404; margin: 0; font-size: 14px; line-height: 1.5;">
+              Tidak ditemukan data siswa untuk <strong>Kelas ${kelas}</strong>.
+            </p>
+            <p style="color: #856404; margin: 10px 0 0 0; font-size: 13px; font-style: italic;">
+              Kelas yang tersedia: ${Object.keys(studentsData).join(', ') || 'Tidak ada'}
+            </p>
+          </div>
+        `;
+        return;
+      }
+
+      // Sort students alphabetically by name (Indonesian locale)
+      const sortedStudents = [...students].sort((a, b) => {
+        return a.nama.localeCompare(b.nama, 'id', { 
+          sensitivity: 'base',
+          numeric: true,
+          ignorePunctuation: true
+        });
+      });
+
+      console.log('Students after sorting:', sortedStudents.length, 'total');
+      console.log('First 3 sorted students:', sortedStudents.slice(0, 3).map((s, idx) => `${idx + 1}. ${s.nama} (${s.lp}) - NIS: ${s.nis}`));
+      console.log('Last 3 sorted students:', sortedStudents.slice(-3).map((s, idx) => `${sortedStudents.length - 2 + idx}. ${s.nama} (${s.lp}) - NIS: ${s.nis}`));
+      
+      // Clear container first
+      studentListContainer.innerHTML = '';
+      
+      // Generate HTML for each student with enhanced error checking
+      let studentListHTML = '';
+      let generatedCount = 0;
+      
+      sortedStudents.forEach((student, index) => {
+        if (!student || !student.nama) {
+          console.warn(`Skipping invalid student at index ${index}:`, student);
+          return;
+        }
+        
+        console.log(`Generating HTML for student ${index + 1}/${sortedStudents.length}: ${student.nama}`);
+        
+        const studentHTML = `
+          <div class="student-item" style="padding: 10px 15px; border-bottom: 1px solid #f0f0f0;" data-student-name="${student.nama}" data-student-nis="${student.nis || ''}" data-student-index="${index}">
+            <div class="student-info" style="display: flex; align-items: center; gap: 10px; flex: 1;">
+              <div class="student-number" style="font-size: 12px; min-width: 30px; font-weight: 600; color: #666;">${index + 1}</div>
+              <div class="student-name" style="font-size: 13px; flex: 1; font-weight: 600; color: #333;">${student.nama}</div>
+              <div class="student-gender" style="font-size: 11px; color: #666; margin-left: 5px;">(${student.lp || 'L'})</div>
+            </div>
+            <div class="attendance-options" style="display: flex; align-items: center; gap: 8px; margin-left: auto;">
+              <select class="attendance-dropdown" data-nis="${student.nis || ''}" data-nama="${student.nama}" data-index="${index}" onchange="selectAttendanceDropdown(this)" style="font-size: 12px; min-width: 90px; max-width: 100px; padding: 6px 8px; border: 2px solid #e1e5e9; border-radius: 8px; background: white;">
+                <option value="Hadir" selected>Hadir</option>
+                <option value="Sakit">Sakit</option>
+                <option value="Izin">Izin</option>
+                <option value="Alpha">Alpha</option>
+              </select>
+            </div>
+          </div>
+        `;
+        
+        studentListHTML += studentHTML;
+        generatedCount++;
+      });
+
+      console.log('Generated HTML for', generatedCount, 'students out of', sortedStudents.length);
+      console.log('Total HTML length:', studentListHTML.length);
+      
+      if (generatedCount === 0) {
+        console.error('No student HTML generated!');
+        studentListContainer.innerHTML = `
+          <div style="text-align: center; padding: 30px; background: #ffebee; border: 2px solid #f44336; border-radius: 10px; margin: 10px 0;">
+            <div style="font-size: 48px; margin-bottom: 15px;">❌</div>
+            <h3 style="color: #c62828; margin: 0 0 10px 0;">Error Generating Student List!</h3>
+            <p style="color: #c62828; margin: 0; font-size: 14px; line-height: 1.5;">
+              Gagal membuat daftar siswa untuk <strong>Kelas ${kelas}</strong>.
+            </p>
+            <p style="color: #c62828; margin: 10px 0 0 0; font-size: 13px; font-style: italic;">
+              Silakan refresh halaman dan coba lagi.
+            </p>
+          </div>
+        `;
+        return;
+      }
+      
+      console.log('Setting innerHTML for student list container...');
       studentListContainer.innerHTML = studentListHTML;
+      
+      // Wait a moment for DOM to update, then verify
+      setTimeout(() => {
+        const renderedItems = studentListContainer.querySelectorAll('.student-item');
+        const renderedDropdowns = studentListContainer.querySelectorAll('.attendance-dropdown');
+        
+        console.log('=== VERIFICATION AFTER DOM UPDATE ===');
+        console.log('Expected students:', sortedStudents.length);
+        console.log('Generated HTML for:', generatedCount);
+        console.log('Rendered student items:', renderedItems.length);
+        console.log('Rendered dropdowns:', renderedDropdowns.length);
+        
+        if (renderedItems.length !== sortedStudents.length) {
+          console.error('❌ MISMATCH: Expected', sortedStudents.length, 'students, but rendered', renderedItems.length);
+          
+          // Debug each rendered item
+          renderedItems.forEach((item, idx) => {
+            const name = item.querySelector('.student-name')?.textContent;
+            const dropdown = item.querySelector('.attendance-dropdown');
+            const studentIndex = item.dataset.studentIndex;
+            console.log(`Rendered item ${idx + 1}: ${name} (index: ${studentIndex}), dropdown exists: ${!!dropdown}`);
+          });
+          
+          // Show error message
+          const errorDiv = document.createElement('div');
+          errorDiv.innerHTML = `
+            <div style="background: #ffebee; border: 2px solid #f44336; border-radius: 8px; padding: 15px; margin: 10px 0; text-align: center;">
+              <strong style="color: #c62828;">⚠️ Peringatan:</strong> 
+              <span style="color: #c62828;">Hanya ${renderedItems.length} dari ${sortedStudents.length} siswa yang berhasil dimuat. Silakan refresh halaman.</span>
+            </div>
+          `;
+          studentListContainer.insertBefore(errorDiv, studentListContainer.firstChild);
+          
+        } else {
+          console.log('✅ All students rendered successfully!');
+          
+          // Verify dropdowns have correct data
+          renderedDropdowns.forEach((dropdown, idx) => {
+            const nis = dropdown.dataset.nis;
+            const nama = dropdown.dataset.nama;
+            const index = dropdown.dataset.index;
+            console.log(`Dropdown ${idx + 1}: NIS=${nis}, Nama=${nama}, Index=${index}`);
+          });
+          
+          console.log('✅ All dropdowns verified successfully!');
+        }
+        
+        console.log('=== END VERIFICATION ===');
+      }, 100);
+      
+      console.log('=== END LOADING STUDENTS ===');
     }
 
 
@@ -4229,6 +4651,9 @@
       const jam = document.getElementById('jamAbsensi').value;
       const tanggal = document.getElementById('tanggalAbsensi').value;
 
+      console.log('=== SAVING ATTENDANCE ===');
+      console.log('Form data:', { kelas, guru, mapel, jam, tanggal });
+
       if (!kelas || !guru || !mapel || !jam || !tanggal) {
         alert('Harap lengkapi semua field!');
         return;
@@ -4246,30 +4671,178 @@
         return;
       }
 
-      // Collect attendance data
+      // Get expected students from studentsData for validation
+      const expectedStudents = studentsData[kelas] || [];
+      console.log('Expected students from studentsData:', expectedStudents.length);
+      console.log('Expected student names:', expectedStudents.map(s => s.nama));
+
+      // Collect attendance data from ALL rendered student items with enhanced validation
       const attendanceData = [];
       const studentItems = document.querySelectorAll('.student-item');
+      const dropdowns = document.querySelectorAll('.attendance-dropdown');
       
-      studentItems.forEach(item => {
-        const studentName = item.querySelector('.student-name').textContent;
+      console.log('Found student items in DOM:', studentItems.length);
+      console.log('Found attendance dropdowns in DOM:', dropdowns.length);
+      
+      if (studentItems.length === 0) {
+        alert('❌ Tidak ada daftar siswa yang ditemukan!\n\nSilakan pilih kelas terlebih dahulu untuk memuat daftar siswa.');
+        return;
+      }
+      
+      if (dropdowns.length === 0) {
+        alert('❌ Tidak ada dropdown absensi yang ditemukan!\n\nSilakan refresh halaman dan coba lagi.');
+        return;
+      }
+      
+      // Process each student item with comprehensive error checking
+      studentItems.forEach((item, index) => {
+        const studentName = item.querySelector('.student-name')?.textContent?.trim();
         const dropdown = item.querySelector('.attendance-dropdown');
-        const status = dropdown ? dropdown.value : 'Hadir';
+        const studentIndex = item.dataset.studentIndex;
+        const nisFromItem = item.dataset.studentNis;
         
-        // Find student data to get NIS and gender
-        const students = studentsData[kelas] || [];
-        const student = students.find(s => s.nama === studentName);
+        console.log(`Processing student item ${index + 1}:`);
+        console.log('  - Student name from DOM:', studentName);
+        console.log('  - Student index from item:', studentIndex);
+        console.log('  - NIS from item:', nisFromItem);
+        console.log('  - Dropdown exists:', !!dropdown);
         
-        attendanceData.push({
-          nis: student ? student.nis : '',
-          nama: studentName,
-          lp: student ? student.lp : 'L',
+        if (!studentName) {
+          console.warn(`Skipping student item ${index + 1} - no name found`);
+          return;
+        }
+        
+        if (!dropdown) {
+          console.warn(`Skipping student item ${index + 1} - no dropdown found for ${studentName}`);
+          return;
+        }
+        
+        const status = dropdown.value || 'Hadir';
+        const nisFromDropdown = dropdown.dataset.nis || '';
+        const namaFromDropdown = dropdown.dataset.nama || '';
+        const indexFromDropdown = dropdown.dataset.index || '';
+        
+        console.log('  - Status from dropdown:', status);
+        console.log('  - NIS from dropdown:', nisFromDropdown);
+        console.log('  - Name from dropdown:', namaFromDropdown);
+        console.log('  - Index from dropdown:', indexFromDropdown);
+        
+        // Find student data with multiple fallback methods
+        let student = null;
+        
+        // Method 1: Find by exact name match
+        student = expectedStudents.find(s => s.nama === studentName);
+        if (student) {
+          console.log('  - ✅ Found student by exact name match');
+        }
+        
+        // Method 2: Find by NIS from dropdown
+        if (!student && nisFromDropdown) {
+          student = expectedStudents.find(s => s.nis === nisFromDropdown);
+          if (student) {
+            console.log('  - ✅ Found student by NIS from dropdown');
+          }
+        }
+        
+        // Method 3: Find by NIS from item
+        if (!student && nisFromItem) {
+          student = expectedStudents.find(s => s.nis === nisFromItem);
+          if (student) {
+            console.log('  - ✅ Found student by NIS from item');
+          }
+        }
+        
+        // Method 4: Find by dropdown name
+        if (!student && namaFromDropdown && namaFromDropdown !== studentName) {
+          student = expectedStudents.find(s => s.nama === namaFromDropdown);
+          if (student) {
+            console.log('  - ✅ Found student by dropdown name');
+          }
+        }
+        
+        // Method 5: Find by index if available
+        if (!student && indexFromDropdown && !isNaN(indexFromDropdown)) {
+          const idx = parseInt(indexFromDropdown);
+          if (idx >= 0 && idx < expectedStudents.length) {
+            // Sort expected students the same way as in loadStudents
+            const sortedExpected = [...expectedStudents].sort((a, b) => {
+              return a.nama.localeCompare(b.nama, 'id', { 
+                sensitivity: 'base',
+                numeric: true,
+                ignorePunctuation: true
+              });
+            });
+            student = sortedExpected[idx];
+            if (student) {
+              console.log('  - ✅ Found student by sorted index:', idx);
+            }
+          }
+        }
+        
+        if (!student) {
+          console.warn(`❌ Student not found in studentsData: ${studentName}`);
+          console.log('  - Available students in class:', expectedStudents.map(s => s.nama));
+          
+          // Create a fallback student record with better data
+          student = {
+            nis: nisFromDropdown || nisFromItem || `TEMP_${Date.now()}_${index}`,
+            nama: studentName,
+            lp: 'L' // Default to L if not found
+          };
+          console.log('  - ⚠️ Created fallback student record:', student);
+        } else {
+          console.log('  - ✅ Using found student:', student);
+        }
+        
+        const attendanceRecord = {
+          nis: student.nis,
+          nama: student.nama,
+          lp: student.lp,
           status: status
-        });
+        };
+        
+        attendanceData.push(attendanceRecord);
+        console.log(`  - ✅ Added to attendance data:`, attendanceRecord);
       });
 
+      console.log('=== ATTENDANCE DATA COLLECTION SUMMARY ===');
+      console.log('Expected students:', expectedStudents.length);
+      console.log('Student items found:', studentItems.length);
+      console.log('Dropdowns found:', dropdowns.length);
+      console.log('Attendance records collected:', attendanceData.length);
+      console.log('Attendance data preview:', attendanceData.slice(0, 3).map((record, idx) => 
+        `${idx + 1}. ${record.nama} (${record.lp}) - ${record.status} - NIS: ${record.nis}`
+      ));
+      console.log('=== END COLLECTION SUMMARY ===');
+
       if (attendanceData.length === 0) {
-        alert('Tidak ada data siswa untuk disimpan!');
+        alert('❌ Tidak ada data siswa untuk disimpan!\n\nPastikan:\n1. Daftar siswa sudah dimuat\n2. Semua dropdown absensi tersedia\n3. Refresh halaman jika perlu');
         return;
+      }
+
+      // Verify we have the expected number of students with detailed reporting
+      if (attendanceData.length !== expectedStudents.length) {
+        console.warn(`⚠️ STUDENT COUNT MISMATCH:`);
+        console.warn(`  - Expected: ${expectedStudents.length} students`);
+        console.warn(`  - Collected: ${attendanceData.length} attendance records`);
+        console.warn(`  - Missing: ${expectedStudents.length - attendanceData.length} students`);
+        
+        // Find missing students
+        const collectedNames = attendanceData.map(record => record.nama);
+        const missingStudents = expectedStudents.filter(student => 
+          !collectedNames.includes(student.nama)
+        );
+        
+        if (missingStudents.length > 0) {
+          console.warn('Missing students:', missingStudents.map(s => s.nama));
+        }
+        
+        const proceed = confirm(`⚠️ Peringatan Data Tidak Lengkap!\n\nDitemukan: ${attendanceData.length} data absensi\nSeharusnya: ${expectedStudents.length} siswa di kelas ${kelas}\nKurang: ${expectedStudents.length - attendanceData.length} siswa\n\n${missingStudents.length > 0 ? `Siswa yang hilang:\n${missingStudents.slice(0, 5).map(s => `• ${s.nama}`).join('\n')}${missingStudents.length > 5 ? `\n... dan ${missingStudents.length - 5} lainnya` : ''}` : ''}\n\nApakah Anda yakin ingin melanjutkan penyimpanan?`);
+        
+        if (!proceed) {
+          console.log('User cancelled save due to student count mismatch');
+          return;
+        }
       }
 
       // Show progress dialog
@@ -4277,62 +4850,116 @@
       document.body.appendChild(progressDialog);
 
       const scriptUrl = 'https://script.google.com/macros/s/AKfycbxFhwS9zqNEbekAl2tcA_Zqi-51uXOg0UZmTjpre-bVrqX5afZPI5KkDqF8Xf5WDON0/exec';
-      const currentTime = new Date().toLocaleTimeString('id-ID');
       
       let successCount = 0;
       let failCount = 0;
+      const failedStudents = [];
 
-      // Save each student's attendance
-      for (let i = 0; i < attendanceData.length; i++) {
-        const student = attendanceData[i];
+      // Process students in smaller batches for better reliability
+      const batchSize = 2;
+      const batches = [];
+      
+      for (let i = 0; i < attendanceData.length; i += batchSize) {
+        batches.push(attendanceData.slice(i, i + batchSize));
+      }
+
+      console.log(`Processing ${attendanceData.length} students in ${batches.length} batches of ${batchSize}`);
+
+      // Process each batch with enhanced error handling
+      for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+        const batch = batches[batchIndex];
         
-        // Update progress
-        updateProgress(i + 1, attendanceData.length);
+        console.log(`Processing batch ${batchIndex + 1}/${batches.length} with ${batch.length} students`);
         
-        try {
-          const formData = new FormData();
+        // Update progress for batch start
+        const startIndex = batchIndex * batchSize;
+        updateProgress(startIndex + 1, attendanceData.length);
+        
+        // Process all students in this batch concurrently
+        const batchPromises = batch.map(async (student, studentIndex) => {
+          const globalIndex = startIndex + studentIndex + 1;
+          console.log(`Sending data for student ${globalIndex}/${attendanceData.length}: ${student.nama}`);
           
-          formData.append('mode', 'insert');
-          formData.append('tanggalAbsen', tanggal);
-          formData.append('namaLengkap', student.nama);
-          formData.append('jenisKelamin', student.lp);
-          formData.append('kelas', kelas);
-          formData.append('jamKe', jam);
-          formData.append('mataPelajaran', mapel);
-          formData.append('status', student.status);
-          formData.append('guru', guru);
+          try {
+            const formData = new FormData();
+            
+            formData.append('tanggalAbsen', tanggal);
+            formData.append('namaLengkap', student.nama);
+            formData.append('jenisKelamin', student.lp);
+            formData.append('kelas', kelas);
+            formData.append('jamKe', jam);
+            formData.append('mataPelajaran', mapel);
+            formData.append('status', student.status);
+            formData.append('guru', guru);
 
-          console.log('Sending attendance data for:', student.nama, 'Status:', student.status);
+            console.log(`Form data for ${student.nama}:`, {
+              tanggalAbsen: tanggal,
+              namaLengkap: student.nama,
+              jenisKelamin: student.lp,
+              kelas: kelas,
+              jamKe: jam,
+              mataPelajaran: mapel,
+              status: student.status,
+              guru: guru
+            });
 
-          const response = await fetch(scriptUrl, {
-            method: 'POST',
-            body: formData
-          });
+            const response = await fetch(scriptUrl, {
+              method: 'POST',
+              body: formData
+            });
 
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log(`Response for student ${globalIndex} (${student.nama}):`, result);
+            
+            if (result.status === 'sukses') {
+              return { success: true, student: student.nama, index: globalIndex };
+            } else {
+              console.error(`Error saving student ${globalIndex}:`, student.nama, result.pesan);
+              return { success: false, student: student.nama, error: result.pesan || 'Unknown error', index: globalIndex };
+            }
+          } catch (error) {
+            console.error(`Network error for student ${globalIndex}:`, student.nama, error);
+            return { success: false, student: student.nama, error: error.message, index: globalIndex };
           }
+        });
 
-          const result = await response.json();
-          console.log('Response for student', student.nama, ':', result);
-          
-          if (result.status === 'sukses') {
+        // Wait for all students in this batch to complete
+        const batchResults = await Promise.all(batchPromises);
+        
+        // Count results
+        batchResults.forEach(result => {
+          if (result.success) {
             successCount++;
+            console.log(`✅ Student ${result.index} (${result.student}) saved successfully`);
           } else {
             failCount++;
-            console.error('Error saving student:', student.nama, result.pesan);
+            failedStudents.push(`${result.student}: ${result.error}`);
+            console.error(`❌ Student ${result.index} (${result.student}) failed: ${result.error}`);
           }
-        } catch (error) {
-          failCount++;
-          console.error('Network error for student:', student.nama, error);
-        }
+        });
 
-        // Small delay to show progress
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Update progress for batch completion
+        const completedCount = Math.min((batchIndex + 1) * batchSize, attendanceData.length);
+        updateProgress(completedCount, attendanceData.length);
+
+        // Small delay between batches to prevent overwhelming the server
+        if (batchIndex < batches.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
       }
 
       // Remove progress dialog
       document.body.removeChild(progressDialog);
+
+      console.log('=== SAVE ATTENDANCE RESULTS ===');
+      console.log('Total processed:', attendanceData.length);
+      console.log('Successful:', successCount);
+      console.log('Failed:', failCount);
+      console.log('Failed students:', failedStudents);
 
       // Show result
       if (successCount === attendanceData.length) {
@@ -4352,8 +4979,20 @@
           loadAttendanceReportData();
         }, 1000);
       } else {
-        alert(`⚠️ Absensi tersimpan sebagian!\n\nBerhasil: ${successCount}\nGagal: ${failCount}\nTotal: ${attendanceData.length}\n\nSilakan coba lagi untuk data yang gagal.`);
+        let errorMessage = `⚠️ Absensi tersimpan sebagian!\n\nBerhasil: ${successCount}\nGagal: ${failCount}\nTotal: ${attendanceData.length}`;
+        
+        if (failedStudents.length > 0) {
+          errorMessage += '\n\nSiswa yang gagal disimpan:\n' + failedStudents.slice(0, 5).join('\n');
+          if (failedStudents.length > 5) {
+            errorMessage += `\n... dan ${failedStudents.length - 5} siswa lainnya`;
+          }
+        }
+        
+        errorMessage += '\n\nSilakan coba lagi untuk data yang gagal.';
+        alert(errorMessage);
       }
+      
+      console.log('=== END SAVE ATTENDANCE ===');
     }
 
     function createProgressDialog(totalStudents) {
@@ -5938,6 +6577,5 @@
       }
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'998cd79e62945f7c',t:'MTc2MjE4MzA4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'998fa8be3076ca4b',t:'MTc2MjIxMjYyMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
-
